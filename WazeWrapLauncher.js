@@ -44,7 +44,7 @@ var WazeWrap = {};
             else{
                 unsafeWindow.WazeWrap = WazeWrap;
                 window.WazeWrap = WazeWrap;
-                await $.getScript("https://greasyfork.org/scripts/24870-wazewrapbeta/code/WazeWrapBeta.js");
+                await $.getScript("https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev");
             }
         }
         else{
@@ -52,7 +52,7 @@ var WazeWrap = {};
                 WazeWrap = window.WazeWrap;
             else{
                 window.WazeWrap = WazeWrap;
-                await $.getScript("https://greasyfork.org/scripts/24870-wazewrapbeta/code/WazeWrapBeta.js");
+                await $.getScript("https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev");
             }
         }
     }
