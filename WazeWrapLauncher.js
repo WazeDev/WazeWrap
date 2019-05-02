@@ -37,7 +37,7 @@ var WazeWrap = {};
     
     async function init(){
         if(typeof unsafeWindow !== 'undefined'){
-            if(unsafeWindow.WazeWrap && (!unsaveWindow.WazeWrap.Version || unsaveWindow.WazeWrap.Version > minVersion)){
+            if(unsafeWindow.WazeWrap && (!unsafeWindow.WazeWrap.Version || unsafeWindow.WazeWrap.Version > minVersion)){
                 window.WazeWrap = unsafeWindow.WazeWrap;
                 WazeWrap = window.WazeWrap;
             }
