@@ -2,7 +2,7 @@
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
 // @version      2019.05.02.01
-// @description  Launcher for the WazeWrap library
+// @description  A base library for WME script writers
 // @author       JustinS83/MapOMatic
 // @include      https://beta.waze.com/*editor*
 // @include      https://www.waze.com/*editor*
