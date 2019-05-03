@@ -20,7 +20,7 @@ var WazeWrap = {};
 (function() {
     'use strict';
 
-    let minVersion = "2019.05.01.01";
+    let minVersion = '2019.05.01.01';
     
     function bootstrap(tries = 1) {
         if (W && W.map &&
@@ -44,7 +44,7 @@ var WazeWrap = {};
             else{
                 unsafeWindow.WazeWrap = WazeWrap;
                 window.WazeWrap = WazeWrap;
-                await $.getScript("https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev");
+                await $.getScript('https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev');
             }
         }
         else{
@@ -52,7 +52,7 @@ var WazeWrap = {};
                 WazeWrap = window.WazeWrap;
             else{
                 window.WazeWrap = WazeWrap;
-                await $.getScript("https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev");
+                await $.getScript('https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev');
             }
         }
     }
