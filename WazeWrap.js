@@ -6,8 +6,6 @@
 (function() {
     'use strict';
 
-    let WazeWrap = typeof unsafeWindow !== 'undefined' ? unsafewindow.WazeWrap : window.WazeWrap;
-
     function bootstrap(tries = 1) {
         if(!location.href.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor\/?.*$/))
             return;
