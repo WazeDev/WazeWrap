@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         WW Launcher Test
+// @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
 // @version      2019.05.02.01
 // @description  Launcher for the WazeWrap library
