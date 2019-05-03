@@ -10,7 +10,6 @@
 // @grant        none
 // ==/UserScript==
 
-/* global W */
 /* global WazeWrap */
 /* global $ */
 /* jshint esversion:6 */
@@ -19,42 +18,32 @@ var WazeWrap = {};
 
 (function() {
     'use strict';
+    const MIN_VERSION = '2019.05.01.01';
+    const WW_URL = 'https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev';
 
-    let minVersion = '2019.05.01.01';
+    async function init(){
+        const sandboxed = typeof unsafeWindow !== 'undefined';
+        const pageWindow = sandboxed ? unsafeWindow : window;
+        const wwAvailable = pageWindow.WazeWrap && (!pageWindow.WazeWrap.Version || pageWindow.WazeWrap.Version > MIN_VERSION);
+
+        if (wwAvailable) {
+            WazeWrap = pageWindow.WazeWrap;
+        } else {
+            pageWindow.WazeWrap = WazeWrap;
+        }
+        if (sandboxed) window.WazeWrap = WazeWrap;
+        if (!wwAvailable) await $.getScript(WW_URL);
+    }
     
     function bootstrap(tries = 1) {
-        if (W && W.map &&
-            W.model && W.loginManager.user &&
-            $)
+        if (typeof $ != 'undefined')
             init();
         else if (tries < 1000)
             setTimeout(function () { bootstrap(tries++); }, 100);
         else
-            console.log('WazeWrap failed to load');
+            console.log('WazeWrap launcher failed to load');
     }
     
     bootstrap();
-    
-    async function init(){
-        if(typeof unsafeWindow !== 'undefined'){
-            if(unsafeWindow.WazeWrap && (!unsafeWindow.WazeWrap.Version || unsafeWindow.WazeWrap.Version > minVersion)){
-                window.WazeWrap = unsafeWindow.WazeWrap;
-                WazeWrap = window.WazeWrap;
-            }
-            else{
-                unsafeWindow.WazeWrap = WazeWrap;
-                window.WazeWrap = WazeWrap;
-                await $.getScript('https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev');
-            }
-        }
-        else{
-            if(window.WazeWrap && (!window.WazeWrap.Version || window.WazeWrap.Version > minVersion))
-                WazeWrap = window.WazeWrap;
-            else{
-                window.WazeWrap = WazeWrap;
-                await $.getScript('https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrap.js?env=dev');
-            }
-        }
-    }
     
 })();
