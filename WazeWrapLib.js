@@ -25,7 +25,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.05.30.03";
+        WazeWrap.Version = "2019.05.30.04";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 
         //SetUpRequire();
@@ -523,11 +523,11 @@
         };
 
         this.getCityName = function (primaryStreetID) {
-            return W.model.cities.getObjectById(this.getCityID(primaryStreetID)).attributes.Name;
+            return W.model.cities.getObjectById(this.getCityID(primaryStreetID)).attributes.name;
         };
 
         this.getStateName = function (primaryStreetID) {
-            return W.model.states.getObjectById(this.getStateID(primaryStreetID)).Name;
+            return W.model.states.getObjectById(this.getStateID(primaryStreetID)).name;
         };
 
         this.getStateID = function (primaryStreetID) {
