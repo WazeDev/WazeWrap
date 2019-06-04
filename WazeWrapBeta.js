@@ -19,7 +19,7 @@ var WazeWrap = {};
 (function() {
     'use strict';
     const MIN_VERSION = '2019.05.01.01';
-    const WW_URL = 'https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrapLib.js?env=dev';
+    const WW_URL = 'https://cdn.statically.io/gh/WazeDev/WazeWrap/beta/WazeWrapLib.js?env=dev';
 
     async function init(){
         const sandboxed = typeof unsafeWindow !== 'undefined';
