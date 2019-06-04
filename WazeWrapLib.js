@@ -125,7 +125,7 @@
 	
 	function saveSettings() {
         if (localStorage) {
-            var settings = {
+            let settings = {
                 displayAlertHistoryIcon: wwSettings.displayAlertHistoryIcon,
                 editorPIN: wwSettings.editorPIN
             };
