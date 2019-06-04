@@ -6,6 +6,7 @@
 
 (function () {
     'use strict';
+	let wwSettings;
 
     function bootstrap(tries = 1) {
         if (!location.href.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor\/?.*$/))
@@ -27,6 +28,8 @@
         console.log("WazeWrap initializing...");
         WazeWrap.Version = "2019.05.30.04";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
+		
+		loadSettings();
 
         //SetUpRequire();
         W.map.events.register("moveend", this, RestoreMissingSegmentFunctions);
@@ -106,16 +109,18 @@
             // ignore if this doesn't work.
         }
 
-
         WazeWrap.Ready = true;
-        /*if(window.WazeWrap){
-	        if(WazeWrap.Version > window.WazeWrap.Version)
-		        window.WazeWrap = WazeWrap;
-        }
-        else
-	      window.WazeWrap = WazeWrap;*/
 
         console.log('WazeWrap Loaded');
+    }
+	
+	function loadSettings() {
+        wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
+        let _defaultsettings = {
+            displayAlertHistoryButton: true,
+            editorPIN: ""
+        };
+        wwSettings = $.extend({}, _defaultsettings, wwSettings);
     }
 
     async function initializeToastr() {
