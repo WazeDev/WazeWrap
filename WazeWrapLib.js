@@ -29,7 +29,7 @@
         WazeWrap.Version = "2019.05.30.04";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
-		loadSettings();
+	loadSettings();
 
         //SetUpRequire();
         W.map.events.register("moveend", this, RestoreMissingSegmentFunctions);
@@ -117,10 +117,20 @@
 	function loadSettings() {
         wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
         let _defaultsettings = {
-            displayAlertHistoryButton: true,
+            displayAlertHistoryIcon: true,
             editorPIN: ""
         };
         wwSettings = $.extend({}, _defaultsettings, wwSettings);
+    }
+	
+	function saveSettings() {
+        if (localStorage) {
+            var settings = {
+                displayAlertHistoryIcon: wwSettings.displayAlertHistoryIcon,
+                editorPIN: wwSettings.editorPIN
+            };
+            localStorage.setItem("_wazewrap_settings", JSON.stringify(settings));
+        }
     }
 
     async function initializeToastr() {
