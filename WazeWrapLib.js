@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.05.30.04";
+        WazeWrap.Version = "2019.0605.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -119,8 +119,8 @@
 	function initializeWWInterface(){
 		var $section = $("<div>", {style:"padding:8px 16px", id:"WMEPIESettings"});
         $section.html([
-			'<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="text" size="1" id="wwEditorPIN"/></div>',
-			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label>'
+			'<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="text" size="10" id="wwEditorPIN"/></div>',
+			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
 			].join(' '));
 		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
 	}
