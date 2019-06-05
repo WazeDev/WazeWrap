@@ -110,9 +110,24 @@
         }
 
         WazeWrap.Ready = true;
+	    
+		initializeWWInterface();
 
         console.log('WazeWrap Loaded');
     }
+	
+	function initializeWWInterface(){
+		var $section = $("<div>", {style:"padding:8px 16px", id:"WMEPIESettings"});
+        $section.html([
+			'<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="text" size="1" id="wwEditorPIN"/></div>',
+			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label>'
+			].join(' '));
+		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
+	}
+	
+	function postInterfaceSetup(){
+		
+	}
 	
 	function loadSettings() {
         wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
