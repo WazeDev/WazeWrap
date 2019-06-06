@@ -141,7 +141,7 @@
 			}
 		});
 		
-		$('#_cbShowAlertHistory').click(function(){
+		$('#_cbShowAlertHistory').change(function(){
 			if(this.checked)
 				$('.WWAlertsHistory').css('display', 'block');
 			else
