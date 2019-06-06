@@ -128,7 +128,7 @@
 	}
 	
 	function postInterfaceSetup(){
-        $('#wwSetPin')[0].value = settings.editorPIN;
+        $('#wwSetPin')[0].value = wwSettings.editorPIN;
 		setChecked('_cbShowAlertHistory', wwSettings.showAlertHistoryIcon);
 		
 		$('#wwSetPin').click(function(){
