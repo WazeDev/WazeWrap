@@ -128,7 +128,15 @@
 	}
 	
 	function postInterfaceSetup(){
-		
+		$('#wwSetPin').click(function(){
+			let pin = $('#wwEditorPIN')[0].value;
+			if(pin != ""){
+				wwSettings.editorPIN = pin;
+				saveSettings();
+				$('#wwEditorPIN').attr("disabled", true);
+				$('#wwSetPin').attr("disabled", true);
+			}
+		});
 	}
 	
 	function loadSettings() {
