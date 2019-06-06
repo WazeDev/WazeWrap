@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.06.06";
+        WazeWrap.Version = "2019.06.06.07";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -121,7 +121,7 @@
         $section.html([
 			'<h4 style="margin-bottom:0px;"><b>WazeWrap</b></h4>',
 			`<h6 style="margin-top:0px;">${WazeWrap.Version}</h6>`,
-			`<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="text" size="10" id="wwEditorPIN" ${wwSettings.editorPIN != "" ? 'disabled' : ''}/>${wwSettings.editorPIN === "" ? '<button id="wwSetPin">Set PIN</button>' : ''}</div><br/>`,
+			`<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="${wwSettings.editorPIN != "" ? "password" : "text"}" size="10" id="wwEditorPIN" ${wwSettings.editorPIN != "" ? 'disabled' : ''}/>${wwSettings.editorPIN === "" ? '<button id="wwSetPin">Set PIN</button>' : ''}<i class="fa fa-eye" style="display:${wwSettings.editorPIN === "" ? 'none' : 'block'}" id="showWWEditorPIN" aria-hidden="true"></i></div><br/>`,
 			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
 			].join(' '));
 		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
@@ -138,6 +138,8 @@
 			if(pin != ""){
 				wwSettings.editorPIN = pin;
 				saveSettings();
+				$('#showWWEditorPIN').css('display', 'block');
+				$('#wwEditorPIN').css('type', 'password');
 				$('#wwEditorPIN').attr("disabled", true);
 				$('#wwSetPin').attr("disabled", true);
 			}
