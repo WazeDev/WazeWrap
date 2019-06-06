@@ -128,6 +128,9 @@
 	}
 	
 	function postInterfaceSetup(){
+        $('#wwSetPin')[0].value = settings.editorPIN;
+		setChecked('_cbShowAlertHistory', wwSettings.showAlertHistoryIcon);
+		
 		$('#wwSetPin').click(function(){
 			let pin = $('#wwEditorPIN')[0].value;
 			if(pin != ""){
@@ -137,12 +140,24 @@
 				$('#wwSetPin').attr("disabled", true);
 			}
 		});
+		
+		$('#_cbShowAlertHistory').click(function(){
+			if(this.checked)
+				$('.WWAlertsHistory').css('display', 'block');
+			else
+				$('.WWAlertsHistory').css('display', 'none');
+			wwSettings.showAlertHistoryIcon = this.checked;
+		});
 	}
+	
+	function setChecked(checkboxId, checked) {
+        $('#' + checkboxId).prop('checked', checked);
+    }
 	
 	function loadSettings() {
         wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
         let _defaultsettings = {
-            displayAlertHistoryIcon: true,
+            showAlertHistoryIcon: true,
             editorPIN: ""
         };
         wwSettings = $.extend({}, _defaultsettings, wwSettings);
@@ -151,7 +166,7 @@
 	function saveSettings() {
         if (localStorage) {
             let settings = {
-                displayAlertHistoryIcon: wwSettings.displayAlertHistoryIcon,
+                showAlertHistoryIcon: wwSettings.showAlertHistoryIcon,
                 editorPIN: wwSettings.editorPIN
             };
             localStorage.setItem("_wazewrap_settings", JSON.stringify(settings));
