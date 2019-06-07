@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.06.08";
+        WazeWrap.Version = "2019.06.07.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -130,8 +130,17 @@
 	function postInterfaceSetup(){
         $('#wwEditorPIN')[0].value = wwSettings.editorPIN;
 		setChecked('_cbShowAlertHistory', wwSettings.showAlertHistoryIcon);
+		
 		if(!wwSettings.showAlertHistoryIcon)
 			$('.WWAlertsHistory').css('display', 'none');
+		
+		$('#showWWEditorPIN').mouseover(function(){
+			$('#wwEditorPIN').attr('type', 'text');
+		});
+		
+		$('#showWWEditorPIN').mouseleave(function(){
+			$('#wwEditorPIN').attr('type', 'password');
+		});
 		
 		$('#wwSetPin').click(function(){
 			let pin = $('#wwEditorPIN')[0].value;
