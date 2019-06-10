@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.07.02";
+        WazeWrap.Version = "2019.06.10.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -49,6 +49,7 @@
         WazeWrap.String = new String();
         WazeWrap.Events = new Events();
         WazeWrap.Alerts = new Alerts();
+	    WazeWrap.Remote = new Remote();
 
         WazeWrap.getSelectedFeatures = function () {
             return W.selectionManager.getSelectedFeatures();
@@ -2038,6 +2039,31 @@
             wazedevtoastr.confirm(message, scriptName, { confirmOK: okFunction, confirmCancel: cancelFunction, ConfirmOkButtonText: okBtnText, ConfirmCancelButtonText: cancelBtnText });
         }
     }
+	
+	function Remote(){
+		this.SaveSettings = async function(script, settings){
+			if(wwSettings.editorPIN === ""){
+				console.error("Editor PIN not set");
+				return null;
+			}
+		}
+		
+		this.RetrieveSettings = async function(script){
+			if(wwSettings.editorPIN === ""){
+				console.error("Editor PIN not set");
+				return null;
+			}
+			try{
+				response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.id}/PIN/${wwSettings.editorPIN}/script/${script}`);
+				response = await response.json();
+				return response;
+			}
+			catch(err){
+				console.log(err);
+				return null;
+			}
+		}
+	}
 
     function String() {
         this.toTitleCase = function (str) {
