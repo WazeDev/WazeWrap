@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.10.02";
+        WazeWrap.Version = "2019.06.10.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2041,9 +2041,31 @@
     }
 	
 	function Remote(){
-		this.SaveSettings = async function(script, settings){
+		this.SaveSettings = async function(scriptName, scriptSettings){
 			if(wwSettings.editorPIN === ""){
 				console.error("Editor PIN not set");
+				return null;
+			}
+			if(scriptName === ""){
+				console.error("No script name provided");
+				return null;
+			}
+			try{
+				let result = await $.ajax({
+				    url: 'https://wazedev.com', 
+				    type: 'POST', 
+				    contentType: 'application/json', 
+				    data: JSON.stringify({
+					    userID: W.loginManager.user.id,
+					    pin: wwSettings.editorPIN,
+					    script: scriptName,
+					    settings: scriptSettings
+				    })}
+				);
+				return result;
+			}
+			catch(err){
+				console.log(err);
 				return null;
 			}
 		}
@@ -2051,6 +2073,10 @@
 		this.RetrieveSettings = async function(script){
 			if(wwSettings.editorPIN === ""){
 				console.error("Editor PIN not set");
+				return null;
+			}
+			if(script === ""){
+				console.error("No script name provided");
 				return null;
 			}
 			try{
