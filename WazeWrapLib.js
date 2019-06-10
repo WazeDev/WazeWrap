@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.10.01";
+        WazeWrap.Version = "2019.06.10.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2054,7 +2054,7 @@
 				return null;
 			}
 			try{
-				response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.id}/PIN/${wwSettings.editorPIN}/script/${script}`);
+				let response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.id}/PIN/${wwSettings.editorPIN}/script/${script}`);
 				response = await response.json();
 				return response;
 			}
