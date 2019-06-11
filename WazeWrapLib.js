@@ -2041,6 +2041,32 @@
     }
 	
 	function Remote(){
+		function sendPOST(scriptName, scriptSettings){
+		    return new Promise(function (resolve, reject) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "https://wazedev.com:8443", true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function(e) {
+			      if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+				  resolve(true)
+				} else {
+				  reject(false)
+				}
+			      }
+			    }
+			xhr.send(JSON.stringify({
+			    userID: W.loginManager.user.id,
+			    pin: wwSettings.editorPIN,
+			    script: scriptName,
+			    settings: scriptSettings
+			    }));
+			});
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "https://wazedev.com:8443", true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+		}
+
 		this.SaveSettings = async function(scriptName, scriptSettings){
 			if(wwSettings.editorPIN === ""){
 				console.error("Editor PIN not set");
@@ -2051,7 +2077,8 @@
 				return null;
 			}
 			try{
-				let result = await $.ajax({
+				return await sendPOST(scriptName, scriptSettings);
+				/*let result = await $.ajax({
 				    url: 'https://wazedev.com:8443', 
 				    type: 'POST', 
 				    contentType: 'application/json', 
@@ -2062,7 +2089,7 @@
 					    settings: scriptSettings
 					})}
 				);
-				return result;
+				return result;*/
 			}
 			catch(err){
 				console.log(err);
