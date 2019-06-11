@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.10.03";
+        WazeWrap.Version = "2019.06.11.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2052,7 +2052,7 @@
 			}
 			try{
 				let result = await $.ajax({
-				    url: 'https://wazedev.com', 
+				    url: 'https://wazedev.com:8443', 
 				    type: 'POST', 
 				    contentType: 'application/json', 
 				    data: JSON.stringify({
@@ -2060,7 +2060,7 @@
 					    pin: wwSettings.editorPIN,
 					    script: scriptName,
 					    settings: scriptSettings
-				    })}
+					})}
 				);
 				return result;
 			}
