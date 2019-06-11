@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.11.05";
+        WazeWrap.Version = "2019.06.11.06";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -157,8 +157,9 @@
 		});
 		
 		$('#wwChangePIN').click(function(){
-			WazeWrap.Alerts.prompt("WazeWrap", "Changing your PIN can result in a loss of your settings on the server and your local machine.  Proceed only if you are sure you need to change this value. \n\n Enter your new PIN", function(e, inputVal){
+			WazeWrap.Alerts.prompt("WazeWrap", "This will <b>not</b> change the PIN stored with your settings, only the PIN that is stored on your machine to lookup/save your settings. \n\nChanging your PIN can result in a loss of your settings on the server and/or your local machine.  Proceed only if you are sure you need to change this value. \n\n Enter your new PIN", function(e, inputVal){
 				wwSettings.editorPIN = inputVal;
+				$('#wwEditorPIN')[0].value = inputVal;
 				saveSettings();
 			});
 		});
