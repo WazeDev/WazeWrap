@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.11.03";
+        WazeWrap.Version = "2019.06.11.04";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -123,6 +123,7 @@
 			'<h4 style="margin-bottom:0px;"><b>WazeWrap</b></h4>',
 			`<h6 style="margin-top:0px;">${WazeWrap.Version}</h6>`,
 			`<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="${wwSettings.editorPIN != "" ? "password" : "text"}" size="10" id="wwEditorPIN" ${wwSettings.editorPIN != "" ? 'disabled' : ''}/>${wwSettings.editorPIN === "" ? '<button id="wwSetPin">Set PIN</button>' : ''}<i class="fa fa-eye fa-lg" style="display:${wwSettings.editorPIN === "" ? 'none' : 'inline-block'}" id="showWWEditorPIN" aria-hidden="true"></i></div><br/>`,
+			`<div id="changePIN" class="controls-container" style="display:${wwSettings.editorPIN !== "" ? "block" : "none"}"><button id="wwChangePIN">Change PIN</button></div>`,
 			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
 			].join(' '));
 		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
@@ -153,6 +154,13 @@
 				$('#wwEditorPIN').attr("disabled", true);
 				$('#wwSetPin').attr("disabled", true);
 			}
+		});
+		
+		$('#wwChangePIN').click(function(){
+			WazeWrap.Alerts.Prompt("WazeWrap", "Changing your PIN can result in a loss of your settings on the server and your local machine.  Proceed only if you are sure you need to change this value. \n\n Enter your new PIN", function(e, inputVal){
+				wwSettings.editorPIN = inputVal;
+				saveSettings();
+			});
 		});
 		
 		$('#_cbShowAlertHistory').change(function(){
