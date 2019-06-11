@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.11.02";
+        WazeWrap.Version = "2019.06.11.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2048,23 +2048,19 @@
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.onreadystatechange = function(e) {
 			      if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-				  resolve(true)
-				} else {
-				  reject(false)
-				}
-			      }
+				      if (xhr.status === 200)
+					  resolve(true)
+					else
+					  reject(false)
+			      	}
 			    }
 			xhr.send(JSON.stringify({
-			    userID: W.loginManager.user.id,
+			    userID: W.loginManager.user.id.toString(),
 			    pin: wwSettings.editorPIN,
 			    script: scriptName,
 			    settings: scriptSettings
 			    }));
 			});
-			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "https://wazedev.com:8443", true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
 		}
 
 		this.SaveSettings = async function(scriptName, scriptSettings){
