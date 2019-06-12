@@ -6,6 +6,7 @@
 
 (function () {
     'use strict';
+	let wwSettings;
 
     function bootstrap(tries = 1) {
         if (!location.href.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor\/?.*$/))
@@ -25,8 +26,10 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.05.30.04";
+        WazeWrap.Version = "2019.06.12.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
+		
+	loadSettings();
 
         //SetUpRequire();
         W.map.events.register("moveend", this, RestoreMissingSegmentFunctions);
@@ -46,6 +49,7 @@
         WazeWrap.String = new String();
         WazeWrap.Events = new Events();
         WazeWrap.Alerts = new Alerts();
+	    WazeWrap.Remote = new Remote();
 
         WazeWrap.getSelectedFeatures = function () {
             return W.selectionManager.getSelectedFeatures();
@@ -106,16 +110,92 @@
             // ignore if this doesn't work.
         }
 
-
         WazeWrap.Ready = true;
-        /*if(window.WazeWrap){
-	        if(WazeWrap.Version > window.WazeWrap.Version)
-		        window.WazeWrap = WazeWrap;
-        }
-        else
-	      window.WazeWrap = WazeWrap;*/
+	    
+		initializeWWInterface();
 
         console.log('WazeWrap Loaded');
+    }
+	
+	function initializeWWInterface(){
+		var $section = $("<div>", {style:"padding:8px 16px", id:"WMEPIESettings"});
+        $section.html([
+			'<h4 style="margin-bottom:0px;"><b>WazeWrap</b></h4>',
+			`<h6 style="margin-top:0px;">${WazeWrap.Version}</h6>`,
+			`<div id="divEditorPIN" class="controls-container">Editor PIN: <input type="${wwSettings.editorPIN != "" ? "password" : "text"}" size="10" id="wwEditorPIN" ${wwSettings.editorPIN != "" ? 'disabled' : ''}/>${wwSettings.editorPIN === "" ? '<button id="wwSetPin">Set PIN</button>' : ''}<i class="fa fa-eye fa-lg" style="display:${wwSettings.editorPIN === "" ? 'none' : 'inline-block'}" id="showWWEditorPIN" aria-hidden="true"></i></div><br/>`,
+			`<div id="changePIN" class="controls-container" style="display:${wwSettings.editorPIN !== "" ? "block" : "none"}"><button id="wwChangePIN">Change PIN</button></div>`,
+			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
+			].join(' '));
+		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
+	}
+	
+	function postInterfaceSetup(){
+        $('#wwEditorPIN')[0].value = wwSettings.editorPIN;
+		setChecked('_cbShowAlertHistory', wwSettings.showAlertHistoryIcon);
+		
+		if(!wwSettings.showAlertHistoryIcon)
+			$('.WWAlertsHistory').css('display', 'none');
+		
+		$('#showWWEditorPIN').mouseover(function(){
+			$('#wwEditorPIN').attr('type', 'text');
+		});
+		
+		$('#showWWEditorPIN').mouseleave(function(){
+			$('#wwEditorPIN').attr('type', 'password');
+		});
+		
+		$('#wwSetPin').click(function(){
+			let pin = $('#wwEditorPIN')[0].value;
+			if(pin != ""){
+				wwSettings.editorPIN = pin;
+				saveSettings();
+				$('#showWWEditorPIN').css('display', 'inline-block');
+				$('#wwEditorPIN').css('type', 'password');
+				$('#wwEditorPIN').attr("disabled", true);
+				$('#wwSetPin').css("display", 'none');
+				$('#changePIN').css("display", 'block');
+			}
+		});
+		
+		$('#wwChangePIN').click(function(){
+			WazeWrap.Alerts.prompt("WazeWrap", "This will <b>not</b> change the PIN stored with your settings, only the PIN that is stored on your machine to lookup/save your settings. \n\nChanging your PIN can result in a loss of your settings on the server and/or your local machine.  Proceed only if you are sure you need to change this value. \n\n Enter your new PIN", '', function(e, inputVal){
+				wwSettings.editorPIN = inputVal;
+				$('#wwEditorPIN')[0].value = inputVal;
+				saveSettings();
+			});
+		});
+		
+		$('#_cbShowAlertHistory').change(function(){
+			if(this.checked)
+				$('.WWAlertsHistory').css('display', 'block');
+			else
+				$('.WWAlertsHistory').css('display', 'none');
+			wwSettings.showAlertHistoryIcon = this.checked;
+			saveSettings();
+		});
+	}
+	
+	function setChecked(checkboxId, checked) {
+        $('#' + checkboxId).prop('checked', checked);
+    }
+	
+	function loadSettings() {
+        wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
+        let _defaultsettings = {
+            showAlertHistoryIcon: true,
+            editorPIN: ""
+        };
+        wwSettings = $.extend({}, _defaultsettings, wwSettings);
+    }
+	
+	function saveSettings() {
+        if (localStorage) {
+            let settings = {
+                showAlertHistoryIcon: wwSettings.showAlertHistoryIcon,
+                editorPIN: wwSettings.editorPIN
+            };
+            localStorage.setItem("_wazewrap_settings", JSON.stringify(settings));
+        }
     }
 
     async function initializeToastr() {
@@ -247,7 +327,7 @@
             '#WWSU-script-update-info { width:auto; background-color:white; height:275px; overflow-y:auto; border-radius:8px; box-shadow: rgba(0, 0, 0, 0.09) 0px 6px 7px 0.09px; padding:15px; position:relative;}',
             '#WWSU-script-update-info div { display: none;}',
             '#WWSU-script-update-info div:target { display: block; }',
-            '.WWAlertsHistory {width:32px; height:32px; background-color: #F89406; position: absolute; top:35px; left:40px; border-radius: 10px; border: 2px solid; box-size: border-box; z-index: 1050;}',
+            `.WWAlertsHistory {display:${wwSettings.showAlertHistoryIcon ? 'block' : 'none'}; width:32px; height:32px; background-color: #F89406; position: absolute; top:35px; left:40px; border-radius: 10px; border: 2px solid; box-size: border-box; z-index: 1050;}`,
             '.WWAlertsHistory:hover #WWAlertsHistory-list{display:block;}',
             '.WWAlertsHistory > .fa-exclamation-triangle {position: absolute; left:50%; margin-left:-9px; margin-top:8px;}',
             '#WWAlertsHistory-list{display:none; position:absolute; top:28px; border:2px solid black; border-radius:10px; background-color:white; padding:4px; overflow-y:auto; max-height: 300px;}',
@@ -1969,6 +2049,80 @@
             wazedevtoastr.confirm(message, scriptName, { confirmOK: okFunction, confirmCancel: cancelFunction, ConfirmOkButtonText: okBtnText, ConfirmCancelButtonText: cancelBtnText });
         }
     }
+	
+	function Remote(){
+		function sendPOST(scriptName, scriptSettings){
+		    return new Promise(function (resolve, reject) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "https://wazedev.com:8443", true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function(e) {
+			      if (xhr.readyState === 4) {
+				      if (xhr.status === 200)
+					  resolve(true)
+					else
+					  reject(false)
+			      	}
+			    }
+			xhr.send(JSON.stringify({
+			    userID: W.loginManager.user.id.toString(),
+			    pin: wwSettings.editorPIN,
+			    script: scriptName,
+			    settings: scriptSettings
+			    }));
+			});
+		}
+
+		this.SaveSettings = async function(scriptName, scriptSettings){
+			if(wwSettings.editorPIN === ""){
+				console.error("Editor PIN not set");
+				return null;
+			}
+			if(scriptName === ""){
+				console.error("No script name provided");
+				return null;
+			}
+			try{
+				return await sendPOST(scriptName, scriptSettings);
+				/*let result = await $.ajax({
+				    url: 'https://wazedev.com:8443', 
+				    type: 'POST', 
+				    contentType: 'application/json', 
+				    data: JSON.stringify({
+					    userID: W.loginManager.user.id,
+					    pin: wwSettings.editorPIN,
+					    script: scriptName,
+					    settings: scriptSettings
+					})}
+				);
+				return result;*/
+			}
+			catch(err){
+				console.log(err);
+				return null;
+			}
+		}
+		
+		this.RetrieveSettings = async function(script){
+			if(wwSettings.editorPIN === ""){
+				console.error("Editor PIN not set");
+				return null;
+			}
+			if(script === ""){
+				console.error("No script name provided");
+				return null;
+			}
+			try{
+				let response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.id}/PIN/${wwSettings.editorPIN}/script/${script}`);
+				response = await response.json();
+				return response;
+			}
+			catch(err){
+				console.log(err);
+				return null;
+			}
+		}
+	}
 
     function String() {
         this.toTitleCase = function (str) {
