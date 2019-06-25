@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.25.01";
+        WazeWrap.Version = "2019.06.25.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -230,6 +230,7 @@
                 $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
             );
 
+		debugger;
             await $.getScript('https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.js');
 		wazedevtoastr.options = {
 		    target: '#map',
