@@ -24,9 +24,9 @@
 
     bootstrap();
 
-    function init() {
+    async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.25.02";
+        WazeWrap.Version = "2019.06.25.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -85,7 +85,7 @@
         };
 
         initializeScriptUpdateInterface();
-        initializeToastr();
+        await initializeToastr();
 
         // 5/22/2019 (mapomatic)
         // Temporary workaround to get the address field on the place edit
@@ -230,7 +230,6 @@
                 $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
             );
 
-		debugger;
             await $.getScript('https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.js');
 		wazedevtoastr.options = {
 		    target: '#map',
