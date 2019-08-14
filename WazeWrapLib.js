@@ -26,7 +26,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.25.03";
+        WazeWrap.Version = "2019.08.14.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -39,6 +39,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
+	RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -335,6 +336,18 @@
         ].join(' ');
         $('<style type="text/css">' + css + '</style>').appendTo('head');
     }
+	
+	function RestoreMissingWRule(){
+		if(!W.Rule){
+			W.Rule = OL.Class(OpenLayers.Rule, {
+				getContext(feature) {
+				return feature;
+				},
+
+				CLASS_NAME: "Waze.Rule"
+			});
+		}
+	}
 
     function RestoreMissingSegmentFunctions() {
         if (W.model.segments.getObjectArray().length > 0) {
