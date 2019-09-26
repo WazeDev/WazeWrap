@@ -26,7 +26,7 @@
 
     function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.06.12.01";
+        WazeWrap.Version = "2019.09.26.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1889,12 +1889,22 @@
                 let checkboxText = group.charAt(0).toUpperCase() + group.substr(1);
                 let newLI = $('<li class="group">');
                 newLI.html([
-                    '<div class="controls-container toggler">',
-                    '<input class="' + groupClass + '" id="' + groupClass + '" type="checkbox" ' + (groupChecked ? 'checked' : '') + '>',
-                    '<label for="' + groupClass + '">',
-                    '<span class="label-text">' + checkboxText + '</span>',
-                    '</label></div>',
-                    '<ul class="children"></ul>'
+                    '<div class="layer-switcher-toggler-tree-category">',
+					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
+					'<span class="wz-toggle-switch">',
+					'<label class="wz-switch">',
+                    '<input class="' + groupClass + ' toggleSwitch" id="' + groupClass + '" type="checkbox" ' + (groupChecked ? 'checked' : '') + '>',
+					'<span class="wz-slider"></span>',
+					'</label></span>',
+					'<label class="label-text" for="' + groupClass + '">' + group + '</label>',
+					'</div>',
+					'<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
+					'<li>',
+                    '<div class="wz-checkbox">',
+                    '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
+                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
+                    '</div>',
+					'</li></ul>'
                 ].join(' '));
 
                 groupList.append(newLI);
@@ -1916,9 +1926,9 @@
                 let groupChildren = $("." + groupClass).parent().parent().find('.children').not('.extended');
                 let $li = $('<li>');
                 $li.html([
-                    '<div class="controls-container toggler">',
+                    '<div class="wz-checkbox">',
                     '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
-                    '<label for="' + checkboxID + '"><span class="label-text">' + checkboxText + '</span></label>',
+                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
                     '</div>',
                 ].join(' '));
 
