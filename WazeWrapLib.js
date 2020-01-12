@@ -1227,7 +1227,7 @@
             jqObj = typeof selector === 'string' ?
                 $(selector) : selector instanceof $ ? selector : null;
 
-            if (!jqObj.size()) {
+            if (!jqObj.length) {
                 window.requestAnimationFrame(function () {
                     WazeWrap.Util.waitForElement(selector, callback, context);
                 });
