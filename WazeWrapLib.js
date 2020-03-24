@@ -7,6 +7,7 @@
 (function () {
     'use strict';
 	let wwSettings;
+	let wEvents;
 
     function bootstrap(tries = 1) {
         if (!location.href.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor\/?.*$/))
@@ -24,21 +25,26 @@
 
     bootstrap();
 
-    function init() {
+    async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.09.26.01";
+        WazeWrap.Version = "2019.10.29.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
+	    if(W.map.events)
+		    wEvents = W.map.events;
+	    else
+		    wEvents = W.map.getMapEventsListener();
 
         //SetUpRequire();
-        W.map.events.register("moveend", this, RestoreMissingSegmentFunctions);
-        W.map.events.register("zoomend", this, RestoreMissingSegmentFunctions);
-        W.map.events.register("moveend", this, RestoreMissingNodeFunctions);
-        W.map.events.register("zoomend", this, RestoreMissingNodeFunctions);
+        wEvents.register("moveend", this, RestoreMissingSegmentFunctions);
+        wEvents.register("zoomend", this, RestoreMissingSegmentFunctions);
+        wEvents.register("moveend", this, RestoreMissingNodeFunctions);
+        wEvents.register("zoomend", this, RestoreMissingNodeFunctions);
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
+	RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -85,7 +91,7 @@
         };
 
         initializeScriptUpdateInterface();
-        initializeToastr();
+        await initializeToastr();
 
         // 5/22/2019 (mapomatic)
         // Temporary workaround to get the address field on the place edit
@@ -230,18 +236,17 @@
                 $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
             );
 
-            await $.getScript('https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.js', function () {
-                wazedevtoastr.options = {
-                    target: '#map',
-                    timeOut: 6000,
-                    positionClass: 'toast-top-center-wide',
-                    closeOnHover: false,
-                    closeDuration: 0,
-                    showDuration: 0,
-                    closeButton: true,
-                    progressBar: true
-                };
-            });
+            await $.getScript('https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.js');
+		wazedevtoastr.options = {
+		    target: '#map',
+		    timeOut: 6000,
+		    positionClass: 'toast-top-center-wide',
+		    closeOnHover: false,
+		    closeDuration: 0,
+		    showDuration: 0,
+		    closeButton: true,
+		    progressBar: true
+		};
 
             if ($('.WWAlertsHistory').length > 0)
                 return;
@@ -336,11 +341,23 @@
         ].join(' ');
         $('<style type="text/css">' + css + '</style>').appendTo('head');
     }
+	
+	function RestoreMissingWRule(){
+		if(!W.Rule){
+			W.Rule = OL.Class(OpenLayers.Rule, {
+				getContext(feature) {
+				return feature;
+				},
+
+				CLASS_NAME: "Waze.Rule"
+			});
+		}
+	}
 
     function RestoreMissingSegmentFunctions() {
         if (W.model.segments.getObjectArray().length > 0) {
-            W.map.events.unregister("moveend", this, RestoreMissingSegmentFunctions);
-            W.map.events.unregister("zoomend", this, RestoreMissingSegmentFunctions);
+            wEvents.unregister("moveend", this, RestoreMissingSegmentFunctions);
+            wEvents.unregister("zoomend", this, RestoreMissingSegmentFunctions);
             if (typeof W.model.segments.getObjectArray()[0].model.getDirection == "undefined")
                 W.model.segments.getObjectArray()[0].__proto__.getDirection = function () { return (this.attributes.fwdDirection ? 1 : 0) + (this.attributes.revDirection ? 2 : 0); };
             if (typeof W.model.segments.getObjectArray()[0].model.isTollRoad == "undefined")
@@ -368,8 +385,8 @@
 
     function RestoreMissingNodeFunctions() {
         if (W.model.nodes.getObjectArray().length > 0) {
-            W.map.events.unregister("moveend", this, RestoreMissingNodeFunctions);
-            W.map.events.unregister("zoomend", this, RestoreMissingNodeFunctions);
+            wEvents.unregister("moveend", this, RestoreMissingNodeFunctions);
+            wEvents.unregister("zoomend", this, RestoreMissingNodeFunctions);
             if (typeof W.model.nodes.getObjectArray()[0].areConnectionsEditable == "undefined")
                 W.model.nodes.getObjectArray()[0].__proto__.areConnectionsEditable = function () { var e = this.model.segments.getByIds(this.attributes.segIDs); return e.length === this.attributes.segIDs.length && e.every(function (e) { return e.canEditConnections(); }); };
         }
@@ -1210,7 +1227,7 @@
             jqObj = typeof selector === 'string' ?
                 $(selector) : selector instanceof $ ? selector : null;
 
-            if (!jqObj.size()) {
+            if (!jqObj.length) {
                 window.requestAnimationFrame(function () {
                     WazeWrap.Util.waitForElement(selector, callback, context);
                 });
@@ -1549,12 +1566,12 @@
 
     function Events() {
         const eventMap = {
-            'moveend': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
-            'zoomend': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
-            'mousemove': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
-            'mouseup': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
-            'mousedown': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
-            'changelayer': { register: function (p1, p2, p3) { W.map.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.map.events.unregister(p1, p2, p3); } },
+            'moveend': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
+            'zoomend': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
+            'mousemove': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
+            'mouseup': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
+            'mousedown': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
+            'changelayer': { register: function (p1, p2, p3) { wEvents.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { wEvents.unregister(p1, p2, p3); } },
             'selectionchanged': { register: function (p1, p2, p3) { W.selectionManager.events.register(p1, p2, p3) }, unregister: function (p1, p2, p3) { W.selectionManager.events.unregister(p1, p2, p3) } },
             'afterundoaction': { register: function (p1, p2, p3) { W.model.actionManager.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.model.actionManager.events.unregister(p1, p2, p3); } },
             'afterclearactions': { register: function (p1, p2, p3) { W.model.actionManager.events.register(p1, p2, p3); }, unregister: function (p1, p2, p3) { W.model.actionManager.events.unregister(p1, p2, p3); } },
@@ -1923,7 +1940,7 @@
                 }
 
             var buildLayerItem = function (isChecked) {
-                let groupChildren = $("." + groupClass).parent().parent().find('.children').not('.extended');
+                let groupChildren = $(".collapsible-GROUP_" + group.toUpperCase());
                 let $li = $('<li>');
                 $li.html([
                     '<div class="wz-checkbox">',
