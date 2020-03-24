@@ -1908,18 +1908,8 @@
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
 					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<span class="wz-toggle-switch">',
-					'<label class="wz-switch">',
-                    '<input class="' + groupClass + ' toggleSwitch" id="' + groupClass + '" type="checkbox" ' + (groupChecked ? 'checked' : '') + '>',
-					'<span class="wz-slider"></span>',
-					'</label></span>',
-					'<label class="label-text" for="' + groupClass + '">' + group + '</label>',
-					'</div>',
-					'<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
-					'<li>',
-                    '<div class="wz-checkbox">',
-                    '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
-                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
+					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" + (groupChecked ? 'checked' : '') + '>',
+					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
                     '</div>',
 					'</li></ul>'
                 ].join(' '));
@@ -1943,10 +1933,8 @@
                 let groupChildren = $(".collapsible-GROUP_" + group.toUpperCase());
                 let $li = $('<li>');
                 $li.html([
-                    '<div class="wz-checkbox">',
-                    '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
-                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
-                    '</div>',
+                    '<wz-checkbox id="' + checkboxID + '" class="hydrated">',
+                    '</wz-checkbox>',
                 ].join(' '));
 
                 groupChildren.append($li);
