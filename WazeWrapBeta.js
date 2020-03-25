@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WazeWrapBeta
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      2019.06.04.01
+// @version      2020.03.25.01
 // @description  A base library for WME script writers
 // @author       JustinS83/MapOMatic
 // @include      https://beta.waze.com/*editor*
@@ -19,7 +19,7 @@ var WazeWrap = {};
 (function() {
     'use strict';
     const MIN_VERSION = '2019.05.01.01';
-    const WW_URL = 'https://cdn.statically.io/gh/WazeDev/WazeWrap/beta/WazeWrapLib.js?env=dev';
+    const WW_URL = 'https://cdn.jsdelivr.net/gh/WazeDev/WazeWrap@beta/WazeWrapLib.js';
 
     async function init(){
         const sandboxed = typeof unsafeWindow !== 'undefined';
