@@ -18,7 +18,7 @@
             $)
             init();
         else if (tries < 1000)
-            setTimeout(function () { bootstrap(tries++); }, 200);
+            setTimeout(function () { bootstrap(++tries); }, 200);
         else
             console.log('WazeWrap failed to load');
     }
@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2020.03.24.03";
+        WazeWrap.Version = "2020.03.24.04";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
