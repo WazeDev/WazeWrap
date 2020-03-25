@@ -18,7 +18,7 @@
             $)
             init();
         else if (tries < 1000)
-            setTimeout(function () { bootstrap(++tries); }, 200);
+            setTimeout(function () { bootstrap(tries++); }, 200);
         else
             console.log('WazeWrap failed to load');
     }
@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2020.03.24.04";
+        WazeWrap.Version = "2020.03.25.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1894,6 +1894,7 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
+			debugger;
             group = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
@@ -1934,7 +1935,7 @@
                 let $li = $('<li>');
                 $li.html([
                     '<wz-checkbox id="' + checkboxID + '" class="hydrated">',
-			checkboxText,
+					checkboxText,
                     '</wz-checkbox>',
                 ].join(' '));
 
