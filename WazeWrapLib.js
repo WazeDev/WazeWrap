@@ -1942,7 +1942,7 @@
                 groupChildren.append($li);
                 $('#' + checkboxID).prop('checked', isChecked);
                 $('#' + checkboxID).change(function () { callback(this.checked); sessionStorage[normalizedText] = this.checked; });
-                if (!$('#' + groupClass).is(':checked')) {
+                if (!$('#' + groupClass).prop('checked')) {
                     $('#' + checkboxID).prop('disabled', true);
                     if (typeof layer === 'undefined')
                         callback(false);
