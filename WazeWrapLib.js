@@ -18,7 +18,7 @@
             $)
             init();
         else if (tries < 1000)
-            setTimeout(function () { bootstrap(tries++); }, 200);
+            setTimeout(function () { bootstrap(++tries); }, 200);
         else
             console.log('WazeWrap failed to load');
     }
@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2019.10.29.02";
+        WazeWrap.Version = "2020.03.25.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1894,6 +1894,7 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
+			debugger;
             group = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
@@ -1908,18 +1909,8 @@
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
 					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<span class="wz-toggle-switch">',
-					'<label class="wz-switch">',
-                    '<input class="' + groupClass + ' toggleSwitch" id="' + groupClass + '" type="checkbox" ' + (groupChecked ? 'checked' : '') + '>',
-					'<span class="wz-slider"></span>',
-					'</label></span>',
-					'<label class="label-text" for="' + groupClass + '">' + group + '</label>',
-					'</div>',
-					'<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
-					'<li>',
-                    '<div class="wz-checkbox">',
-                    '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
-                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
+					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" + '(groupChecked ? 'checked' : '') + '>',
+					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
                     '</div>',
 					'</li></ul>'
                 ].join(' '));
@@ -1943,16 +1934,15 @@
                 let groupChildren = $(".collapsible-GROUP_" + group.toUpperCase());
                 let $li = $('<li>');
                 $li.html([
-                    '<div class="wz-checkbox">',
-                    '<input type="checkbox" id="' + checkboxID + '"  class="' + checkboxID + ' toggle">',
-                    '<label for="' + checkboxID + '">' + checkboxText + '</label>',
-                    '</div>',
+                    '<wz-checkbox id="' + checkboxID + '" class="hydrated">',
+					checkboxText,
+                    '</wz-checkbox>',
                 ].join(' '));
 
                 groupChildren.append($li);
                 $('#' + checkboxID).prop('checked', isChecked);
                 $('#' + checkboxID).change(function () { callback(this.checked); sessionStorage[normalizedText] = this.checked; });
-                if (!$('#' + groupClass).is(':checked')) {
+                if (!$('#' + groupClass).prop('checked')) {
                     $('#' + checkboxID).prop('disabled', true);
                     if (typeof layer === 'undefined')
                         callback(false);
