@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2020.03.24.02";
+        WazeWrap.Version = "2020.03.24.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1934,6 +1934,7 @@
                 let $li = $('<li>');
                 $li.html([
                     '<wz-checkbox id="' + checkboxID + '" class="hydrated">',
+			checkboxText,
                     '</wz-checkbox>',
                 ].join(' '));
 
