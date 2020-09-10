@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2020.05.22.01";
+        WazeWrap.Version = "2020.09.09.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1003,22 +1003,24 @@
                 timeoutId: null,
                 forced: !1,
                 active: !1,
+				viewPortDiv: null,
                 initialize: function (e) {
                     this.map = e,
-                        this.uniqueID = myDragElement.baseID--
+                        this.uniqueID = myDragElement.baseID--;
+						this.viewPortDiv = W.map.getViewport();
                 },
                 callback: function (e, t) {
                     if (this[e])
                         return this[e].apply(this, t)
                 },
                 dragstart: function (e) {
-                    e.xy = new OpenLayers.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1]);
+                    e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1]);
                     var t = !0;
                     return this.dragging = !1,
                         (OpenLayers.Event.isLeftClick(e) || OpenLayers.Event.isSingleTouch(e)) && (this.started = !0,
                             this.start = e.xy,
                             this.last = e.xy,
-                            OpenLayers.Element.addClass(this.map.viewPortDiv, "olDragDown"),
+                            OpenLayers.Element.addClass(this.viewPortDiv, "olDragDown"),
                             this.down(e),
                             this.callback("down", [e.xy]),
                             OpenLayers.Event.stop(e),
@@ -1043,7 +1045,7 @@
                         return this.endDrag()
                 },
                 dragmove: function (e) {
-                    return this.map.viewPortDiv.offsets && (e.xy = new OpenLayers.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1])),
+                    return this.viewPortDiv.offsets && (e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1])),
                         this.lastMoveEvt = e,
                         !this.started || this.timeoutId || e.xy.x === this.last.x && e.xy.y === this.last.y || (this.interval > 0 && (this.timeoutId = window.setTimeout(OpenLayers.Function.bind(this.removeTimeout, this), this.interval)),
                             this.dragging = !0,
@@ -1054,7 +1056,7 @@
                         !0
                 },
                 dragend: function (e) {
-                    if (e.xy = new OpenLayers.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1]),
+                    if (e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1]),
                         this.started) {
                         var t = this.start !== this.last;
                         this.endDrag(),
@@ -1068,7 +1070,7 @@
                     this.started = !1,
                         this.dragging = !1,
                         this.forced = !1,
-                        OpenLayers.Element.removeClass(this.map.viewPortDiv, "olDragDown"),
+                        OpenLayers.Element.removeClass(this.viewPortDiv, "olDragDown"),
                         document.onselectstart = this.oldOnselectstart
                 },
                 down: function (e) { },
@@ -1115,7 +1117,7 @@
                 activate: function (e) {
                     this.$el = e,
                         this.active = !0;
-                    var t = $(this.map.viewPortDiv);
+                    var t = $(this.viewPortDiv);
                     return this.$el.on("mousedown.drag-" + this.uniqueID, $.proxy(this.mousedown, this)),
                         this.$el.on("touchstart.drag-" + this.uniqueID, $.proxy(this.touchstart, this)),
                         t.on("mouseup.drag-" + this.uniqueID, $.proxy(this.mouseup, this)),
@@ -1126,17 +1128,17 @@
                 deactivate: function () {
                     return this.active = !1,
                         this.$el.off(".drag-" + this.uniqueID),
-                        $(this.map.viewPortDiv).off(".drag-" + this.uniqueID),
+                        $(this.viewPortDiv).off(".drag-" + this.uniqueID),
                         this.touch = !1,
                         this.started = !1,
                         this.forced = !1,
                         this.dragging = !1,
                         this.start = null,
                         this.last = null,
-                        OpenLayers.Element.removeClass(this.map.viewPortDiv, "olDragDown")
+                        OpenLayers.Element.removeClass(this.viewPortDiv, "olDragDown")
                 },
                 adjustXY: function (e) {
-                    var t = OpenLayers.Util.pagePosition(this.map.viewPortDiv);
+                    var t = OpenLayers.Util.pagePosition(this.viewPortDiv);
                     return e.xy.x -= t[0],
                         e.xy.y -= t[1]
                 },
