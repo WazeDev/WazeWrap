@@ -1950,7 +1950,7 @@
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
 					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" + '(groupChecked ? 'checked' : '') + '>',
+					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
 					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
                     '</div>',
 					'</li></ul>'
