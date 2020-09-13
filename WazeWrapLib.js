@@ -1936,31 +1936,32 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
-            group = group.toLowerCase();
+            let normalizedGroup = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
             let groupPrefix = 'layer-switcher-group_';
-            let groupClass = groupPrefix + group.toLowerCase();
+            let groupClass = groupPrefix + normalizedGroup;
             sessionStorage[normalizedText] = checked;
 
             let CreateParentGroup = function (groupChecked) {
                 let groupList = $('.layer-switcher').find('.list-unstyled.togglers');
-                let checkboxText = group.charAt(0).toUpperCase() + group.substr(1);
                 let newLI = $('<li class="group">');
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
-					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
-					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
+		    '<i class="toggle-category w-icon w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
+		    '<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
+		    '</wz-toggle-switch>',
+		    '<label class="label-text" for="' + groupClass + '">' + group + '</label>',
                     '</div>',
-					'</li></ul>'
+                    '<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
+	            '</ul></li>'
                 ].join(' '));
 
                 groupList.append(newLI);
                 $('#' + groupClass).change(function () { sessionStorage[groupClass] = this.checked; });
             };
 
-            if (group !== "issues" && group !== "places" && group !== "road" && group !== "display") //"non-standard" group, check its existence
+            if (normalizedGroup !== "issues" && normalizedGroup !== "places" && normalizedGroup !== "road" && normalizedGroup !== "display") //"non-standard" group, check its existence
                 if ($('.' + groupClass).length === 0) { //Group doesn't exist yet, create it
                     let isParentChecked = (typeof sessionStorage[groupClass] == "undefined" ? true : sessionStorage[groupClass] == 'true');
                     CreateParentGroup(isParentChecked);  //create the group
