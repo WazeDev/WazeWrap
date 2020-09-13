@@ -1936,11 +1936,12 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
-            let normalizedGroup = group.toLowerCase();
+            let groupLabel = group;
+	    group = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
             let groupPrefix = 'layer-switcher-group_';
-            let groupClass = groupPrefix + normalizedGroup;
+            let groupClass = groupPrefix + group;
             sessionStorage[normalizedText] = checked;
 
             let CreateParentGroup = function (groupChecked) {
@@ -1951,7 +1952,7 @@
 		    '<i class="toggle-category w-icon w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
 		    '<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
 		    '</wz-toggle-switch>',
-		    '<label class="label-text" for="' + groupClass + '">' + group + '</label>',
+		    '<label class="label-text" for="' + groupClass + '">' + groupLabel + '</label>',
                     '</div>',
                     '<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
 	            '</ul></li>'
@@ -1961,7 +1962,7 @@
                 $('#' + groupClass).change(function () { sessionStorage[groupClass] = this.checked; });
             };
 
-            if (normalizedGroup !== "issues" && normalizedGroup !== "places" && normalizedGroup !== "road" && normalizedGroup !== "display") //"non-standard" group, check its existence
+            if (group !== "issues" && group !== "places" && group !== "road" && group !== "display") //"non-standard" group, check its existence
                 if ($('.' + groupClass).length === 0) { //Group doesn't exist yet, create it
                     let isParentChecked = (typeof sessionStorage[groupClass] == "undefined" ? true : sessionStorage[groupClass] == 'true');
                     CreateParentGroup(isParentChecked);  //create the group
