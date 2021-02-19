@@ -1893,8 +1893,7 @@
                     if (W.prefs) {
                         W.prefs.on('change:isImperial', function () { that.appendTab(); });
                     }
-                    W.app.modeController.model.bind('change:mode', function () { that.appendTab(); });
-                }
+                  }
             }
 
             append(content) {
@@ -1966,9 +1965,7 @@
                     CreateParentGroup(isParentChecked);  //create the group
                     sessionStorage[groupClass] = isParentChecked;
 
-                    W.app.modeController.model.bind('change:mode', function (model, modeId, context) { //make it reappear after changing modes
-                        CreateParentGroup((sessionStorage[groupClass] == 'true'));
-                    });
+                     });
                 }
 
             var buildLayerItem = function (isChecked) {
@@ -2008,10 +2005,7 @@
                 });
             };
 
-            W.app.modeController.model.bind('change:mode', function (model, modeId, context) {
-                buildLayerItem((sessionStorage[normalizedText] == 'true'));
-            });
-            buildLayerItem(checked);
+             buildLayerItem(checked);
         };
 
 		/**
