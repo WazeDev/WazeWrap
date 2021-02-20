@@ -1964,8 +1964,6 @@
                     let isParentChecked = (typeof sessionStorage[groupClass] == "undefined" ? true : sessionStorage[groupClass] == 'true');
                     CreateParentGroup(isParentChecked);  //create the group
                     sessionStorage[groupClass] = isParentChecked;
-
-                     });
                 }
 
             var buildLayerItem = function (isChecked) {
