@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2021.02.20.01";
+        WazeWrap.Version = "2021.02.23.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1901,17 +1901,15 @@
             }
 
             appendTab() {
-                if (W.app.attributes.mode === 0) { /*Only in default mode */
-                    WazeWrap.Util.waitForElement(
-                        this.TAB_SELECTOR + ',' + this.CONTENT_SELECTOR,
-                        function () {
-                            $(this.TAB_SELECTOR).append(this.$tab);
-                            $(this.CONTENT_SELECTOR).first().append(this.$content);
-                            if (this.callback) {
-                                this.callback.call(this.context);
-                            }
-                        }, this);
-                }
+		    WazeWrap.Util.waitForElement(
+			this.TAB_SELECTOR + ',' + this.CONTENT_SELECTOR,
+			function () {
+			    $(this.TAB_SELECTOR).append(this.$tab);
+			    $(this.CONTENT_SELECTOR).first().append(this.$content);
+			    if (this.callback) {
+				this.callback.call(this.context);
+			    }
+			}, this);
             }
 
             clearContent() {
