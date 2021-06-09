@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2021.02.23.01";
+        WazeWrap.Version = "2021.06.09.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1738,10 +1738,10 @@
 		* @private
 		*/
             doesEventExist() {
-                this.eventExists = 'undefined' !== typeof W.accelerators.events.listeners[this.name] &&
-                    W.accelerators.events.listeners[this.name].length > 0 &&
-                    this.callback === W.accelerators.events.listeners[this.name][0].func &&
-                    this.scope === W.accelerators.events.listeners[this.name][0].obj;
+                this.eventExists = 'undefined' !== typeof W.accelerators.events.dispatcher._events[this.name] &&
+                    W.accelerators.events.dispatcher._events[this.name].length > 0 &&
+                    this.callback === W.accelerators.events.dispatcher._events[this.name][0].func &&
+                    this.scope === W.accelerators.events.dispatcher._events[this.name][0].obj;
                 return this.eventExists;
             }
 
