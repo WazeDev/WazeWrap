@@ -1300,7 +1300,7 @@
                 W.vent.on('operationDone', function () {
                     mapReady = true;
                 });
-			}
+            }
             else {
                 W.app.layout.model.on('operationPending', function () {
                     mapReady = false;
