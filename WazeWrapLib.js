@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2021.06.09.02";
+        WazeWrap.Version = "2021.12.11.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -737,9 +737,17 @@
                 return $.Deferred(function (dfd) {
                     var resolve = function () {
                         dfd.resolve();
-                        W.vent.off('operationDone', resolve);
+                        if (W.hasOwnProperty('vent')){
+                            W.vent.off('operationDone', resolve);
+                        } else  {
+                            W.app.layout.model.off('operationDone', resolve);
+                        }
                     };
-                    W.vent.on('operationDone', resolve);
+                    if (W.hasOwnProperty('vent')){
+                        W.vent.on('operationDone', resolve);
+                    } else  {
+                        W.app.layout.model.on('operationDone', resolve);
+                    }
                 }).promise();
             };
 
@@ -1285,13 +1293,24 @@
          */
         this.mapReady = function () {
             var mapReady = true;
-            W.vent.on('operationPending', function () {
-                mapReady = false;
-            });
-            W.vent.on('operationDone', function () {
-                mapReady = true;
-            });
-            return function () {
+            if (W.hasOwnProperty('vent')){
+                W.vent.on('operationPending', function () {
+                    mapReady = false;
+                });
+                W.vent.on('operationDone', function () {
+                    mapReady = true;
+                });
+			}
+            else {
+                W.app.layout.model.on('operationPending', function () {
+                    mapReady = false;
+                });
+                W.app.layout.model.on('operationDone', function () {
+                    mapReady = true;
+                });
+            }
+
+             return function () {
                 return mapReady;
             };
         }();
