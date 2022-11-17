@@ -260,7 +260,7 @@
             $('.WWAlertsHistory').css('top', `${toastrSettings.historyTopLoc}px`);
 
             try {
-                await $.getScript("https://greasyfork.org/scripts/427721-jquery-ui-1-11-4-custom-min-js/code/jquery%20ui%201-11-4%20custom%20min%20js.js");
+                await $.getScript("https://greasyfork.org/scripts/454988-jqueryui-custom-build/code/jQueryUI%20custom%20build.js");
             }
             catch (err) {
                 console.log("Could not load jQuery UI " + err);
