@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2021.12.11.01";
+        WazeWrap.Version = "2023.01.02.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -588,10 +588,11 @@
                 if (ignorePLR && segmentType === 20) //PLR
                     continue;
 
-                if (ignoreUnnamedPR)
-                    if (segmentType === 17 && WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID) === null) //PR
+                if (ignoreUnnamedPR && segmentType === 17) {
+                    var nm = WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID);
+                    if (nm === null || nm == "") //PR
                         continue;
-
+                }
 
                 let distanceToSegment = mygeometry.distanceTo(onscreenSegments[s].geometry, { details: true });
 
