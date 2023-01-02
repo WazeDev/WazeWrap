@@ -737,17 +737,9 @@
                 return $.Deferred(function (dfd) {
                     var resolve = function () {
                         dfd.resolve();
-                        if (W.hasOwnProperty('vent')){
-                            W.vent.off('operationDone', resolve);
-                        } else  {
-                            W.app.layout.model.off('operationDone', resolve);
-                        }
+                        W.app.layout.model.off('operationDone', resolve);
                     };
-                    if (W.hasOwnProperty('vent')){
-                        W.vent.on('operationDone', resolve);
-                    } else  {
-                        W.app.layout.model.on('operationDone', resolve);
-                    }
+                    W.app.layout.model.on('operationDone', resolve);
                 }).promise();
             };
 
@@ -1293,24 +1285,14 @@
          */
         this.mapReady = function () {
             var mapReady = true;
-            if (W.hasOwnProperty('vent')){
-                W.vent.on('operationPending', function () {
-                    mapReady = false;
-                });
-                W.vent.on('operationDone', function () {
-                    mapReady = true;
-                });
-            }
-            else {
-                W.app.layout.model.on('operationPending', function () {
-                    mapReady = false;
-                });
-                W.app.layout.model.on('operationDone', function () {
-                    mapReady = true;
-                });
-            }
+            W.app.layout.model.on('operationPending', function () {
+                mapReady = false;
+            });
+            W.app.layout.model.on('operationDone', function () {
+                mapReady = true;
+            });
 
-             return function () {
+            return function () {
                 return mapReady;
             };
         }();
