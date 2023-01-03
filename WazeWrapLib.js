@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2021.12.11.01";
+        WazeWrap.Version = "2023.01.02.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -588,10 +588,11 @@
                 if (ignorePLR && segmentType === 20) //PLR
                     continue;
 
-                if (ignoreUnnamedPR)
-                    if (segmentType === 17 && WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID) === null) //PR
+                if (ignoreUnnamedPR && segmentType === 17) {
+                    var nm = WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID);
+                    if (nm === null || nm == "") //PR
                         continue;
-
+                }
 
                 let distanceToSegment = mygeometry.distanceTo(onscreenSegments[s].geometry, { details: true });
 
@@ -737,17 +738,9 @@
                 return $.Deferred(function (dfd) {
                     var resolve = function () {
                         dfd.resolve();
-                        if (W.hasOwnProperty('vent')){
-                            W.vent.off('operationDone', resolve);
-                        } else  {
-                            W.app.layout.model.off('operationDone', resolve);
-                        }
+                        W.app.layout.model.off('operationDone', resolve);
                     };
-                    if (W.hasOwnProperty('vent')){
-                        W.vent.on('operationDone', resolve);
-                    } else  {
-                        W.app.layout.model.on('operationDone', resolve);
-                    }
+                    W.app.layout.model.on('operationDone', resolve);
                 }).promise();
             };
 
@@ -1293,24 +1286,14 @@
          */
         this.mapReady = function () {
             var mapReady = true;
-            if (W.hasOwnProperty('vent')){
-                W.vent.on('operationPending', function () {
-                    mapReady = false;
-                });
-                W.vent.on('operationDone', function () {
-                    mapReady = true;
-                });
-            }
-            else {
-                W.app.layout.model.on('operationPending', function () {
-                    mapReady = false;
-                });
-                W.app.layout.model.on('operationDone', function () {
-                    mapReady = true;
-                });
-            }
+            W.app.layout.model.on('operationPending', function () {
+                mapReady = false;
+            });
+            W.app.layout.model.on('operationDone', function () {
+                mapReady = true;
+            });
 
-             return function () {
+            return function () {
                 return mapReady;
             };
         }();
