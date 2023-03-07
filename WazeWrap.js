@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      2020.03.25.01
+// @version      2023.03.07.01
 // @description  A base library for WME script writers
 // @author       JustinS83/MapOMatic
 // @include      https://beta.waze.com/*editor*
 // @include      https://www.waze.com/*editor*
 // @exclude      https://www.waze.com/*user/editor/*
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 /* global WazeWrap */
