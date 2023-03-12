@@ -30,7 +30,7 @@
         WazeWrap.Version = "2023.01.02.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
-	loadSettings();
+	    loadSettings();
 	    if(W.map.events)
 		    wEvents = W.map.events;
 	    else
@@ -44,7 +44,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
-	RestoreMissingWRule();
+	    RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -92,29 +92,6 @@
 
         initializeScriptUpdateInterface();
         await initializeToastr();
-
-        // 5/22/2019 (mapomatic)
-        // Temporary workaround to get the address field on the place edit
-        // panel to update when the place is updated.  Can be removed if
-        // staff fixes it on their end.
-        try {
-            W.model.venues.on('objectschanged', venues => {
-                // Update venue address field display, if needed.
-                try {
-                    const features = WazeWrap.getSelectedFeatures();
-                    if (features.length === 1) {
-                        const venue = features[0].model;
-                        if (venues.includes(venue)) {
-                            $('#landmark-edit-general span.full-address').text(venue.getAddress().format());
-                        }
-                    }
-                } catch (ex) {
-                    console.error('WazeWrap error:', ex)
-                }
-            });
-        } catch (ex) {
-            // ignore if this doesn't work.
-        }
 
         WazeWrap.Ready = true;
 	    
