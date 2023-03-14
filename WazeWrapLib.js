@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.03.14.02";
+        WazeWrap.Version = "2023.03.14.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1849,24 +1849,20 @@
 		 * @param {string} 
 		 * @param {string} 
 		 * @param {function} 
-		 * @param {object} 
+		 * @param {string} 
 		**/
-        this.Tab = class Tab {
-            constructor(name, content, callback, labelText) {
-                this.callback = null;
-                this.$content = null;
-
-				if(labelText == "")
-					labelText == name;
-				
-				const {tabLabel, tabPane} = W.userscripts.registerSidebarTab(name);
-				
-				tabLabel.innerText = labelText;
-				tabPane.innerHTML = content;
-				
-				tabPane.addEventListener('element-connected', callback, {once:true});
-
-            }
+        this.Tab = async function Tab(name, content, callback, labelText) {
+			if(labelText == "")
+				labelText = name;
+			
+			const {tabLabel, tabPane} = W.userscripts.registerSidebarTab(name);
+			
+			tabLabel.innerText = labelText;
+			tabPane.innerHTML = content;
+			
+			await W.userscripts.waitForElementConnected(tabPane);
+			if('function' === typeof callback)
+				callback();
 
         }
 
