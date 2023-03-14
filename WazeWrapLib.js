@@ -18,7 +18,7 @@
             $)
             init();
         else if (tries < 1000)
-            setTimeout(function () { bootstrap(tries++); }, 200);
+            setTimeout(function () { bootstrap(++tries); }, 200);
         else
             console.log('WazeWrap failed to load');
     }
@@ -27,10 +27,10 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2020.03.25.01";
+        WazeWrap.Version = "2023.01.02.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
-	loadSettings();
+	    loadSettings();
 	    if(W.map.events)
 		    wEvents = W.map.events;
 	    else
@@ -44,7 +44,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
-	RestoreMissingWRule();
+	    RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -92,29 +92,6 @@
 
         initializeScriptUpdateInterface();
         await initializeToastr();
-
-        // 5/22/2019 (mapomatic)
-        // Temporary workaround to get the address field on the place edit
-        // panel to update when the place is updated.  Can be removed if
-        // staff fixes it on their end.
-        try {
-            W.model.venues.on('objectschanged', venues => {
-                // Update venue address field display, if needed.
-                try {
-                    const features = WazeWrap.getSelectedFeatures();
-                    if (features.length === 1) {
-                        const venue = features[0].model;
-                        if (venues.includes(venue)) {
-                            $('#landmark-edit-general span.full-address').text(venue.getAddress().format());
-                        }
-                    }
-                } catch (ex) {
-                    console.error('WazeWrap error:', ex)
-                }
-            });
-        } catch (ex) {
-            // ignore if this doesn't work.
-        }
 
         WazeWrap.Ready = true;
 	    
@@ -260,7 +237,7 @@
             $('.WWAlertsHistory').css('top', `${toastrSettings.historyTopLoc}px`);
 
             try {
-                await $.getScript("https://greasyfork.org/scripts/28687-jquery-ui-1-11-4-custom-min-js/code/jquery-ui-1114customminjs.js");
+                await $.getScript("https://greasyfork.org/scripts/454988-jqueryui-custom-build/code/jQueryUI%20custom%20build.js");
             }
             catch (err) {
                 console.log("Could not load jQuery UI " + err);
@@ -344,7 +321,7 @@
 	
 	function RestoreMissingWRule(){
 		if(!W.Rule){
-			W.Rule = OL.Class(OpenLayers.Rule, {
+			W.Rule = OpenLayers.Class(OpenLayers.Rule, {
 				getContext(feature) {
 				return feature;
 				},
@@ -393,16 +370,16 @@
     }
     /* jshint ignore:start */
     function RestoreMissingOLKMLSupport() {
-        if (!OL.Format.KML) {
-            OL.Format.KML = OL.Class(OL.Format.XML, {
+        if (!OpenLayers.Format.KML) {
+            OpenLayers.Format.KML = OpenLayers.Class(OpenLayers.Format.XML, {
                 namespaces: { kml: "http://www.opengis.net/kml/2.2", gx: "http://www.google.com/kml/ext/2.2" }, kmlns: "http://earth.google.com/kml/2.0", placemarksDesc: "No description available", foldersName: "OL export", foldersDesc: "Exported on " + new Date, extractAttributes: !0, kvpAttributes: !1, extractStyles: !1, extractTracks: !1, trackAttributes: null, internalns: null, features: null, styles: null, styleBaseUrl: "", fetched: null, maxDepth: 0, initialize: function (a) {
                 this.regExes =
-                    { trimSpace: /^\s*|\s*$/g, removeSpace: /\s*/g, splitSpace: /\s+/, trimComma: /\s*,\s*/g, kmlColor: /(\w{2})(\w{2})(\w{2})(\w{2})/, kmlIconPalette: /root:\/\/icons\/palette-(\d+)(\.\w+)/, straightBracket: /\$\[(.*?)\]/g }; this.externalProjection = new OL.Projection("EPSG:4326"); OL.Format.XML.prototype.initialize.apply(this, [a])
+                    { trimSpace: /^\s*|\s*$/g, removeSpace: /\s*/g, splitSpace: /\s+/, trimComma: /\s*,\s*/g, kmlColor: /(\w{2})(\w{2})(\w{2})(\w{2})/, kmlIconPalette: /root:\/\/icons\/palette-(\d+)(\.\w+)/, straightBracket: /\$\[(.*?)\]/g }; this.externalProjection = new OpenLayers.Projection("EPSG:4326"); OpenLayers.Format.XML.prototype.initialize.apply(this, [a])
                 }, read: function (a) { this.features = []; this.styles = {}; this.fetched = {}; return this.parseData(a, { depth: 0, styleBaseUrl: this.styleBaseUrl }) }, parseData: function (a, b) {
                 "string" == typeof a &&
-                    (a = OL.Format.XML.prototype.read.apply(this, [a])); for (var c = ["Link", "NetworkLink", "Style", "StyleMap", "Placemark"], d = 0, e = c.length; d < e; ++d) { var f = c[d], g = this.getElementsByTagNameNS(a, "*", f); if (0 != g.length) switch (f.toLowerCase()) { case "link": case "networklink": this.parseLinks(g, b); break; case "style": this.extractStyles && this.parseStyles(g, b); break; case "stylemap": this.extractStyles && this.parseStyleMaps(g, b); break; case "placemark": this.parseFeatures(g, b) } } return this.features
+                    (a = OpenLayers.Format.XML.prototype.read.apply(this, [a])); for (var c = ["Link", "NetworkLink", "Style", "StyleMap", "Placemark"], d = 0, e = c.length; d < e; ++d) { var f = c[d], g = this.getElementsByTagNameNS(a, "*", f); if (0 != g.length) switch (f.toLowerCase()) { case "link": case "networklink": this.parseLinks(g, b); break; case "style": this.extractStyles && this.parseStyles(g, b); break; case "stylemap": this.extractStyles && this.parseStyleMaps(g, b); break; case "placemark": this.parseFeatures(g, b) } } return this.features
                 }, parseLinks: function (a,
-                    b) { if (b.depth >= this.maxDepth) return !1; var c = OL.Util.extend({}, b); c.depth++; for (var d = 0, e = a.length; d < e; d++) { var f = this.parseProperty(a[d], "*", "href"); f && !this.fetched[f] && (this.fetched[f] = !0, (f = this.fetchLink(f)) && this.parseData(f, c)) } }, fetchLink: function (a) { if (a = OL.Request.GET({ url: a, async: !1 })) return a.responseText }, parseStyles: function (a, b) { for (var c = 0, d = a.length; c < d; c++) { var e = this.parseStyle(a[c]); e && (this.styles[(b.styleBaseUrl || "") + "#" + e.id] = e) } }, parseKmlColor: function (a) {
+                    b) { if (b.depth >= this.maxDepth) return !1; var c = OpenLayers.Util.extend({}, b); c.depth++; for (var d = 0, e = a.length; d < e; d++) { var f = this.parseProperty(a[d], "*", "href"); f && !this.fetched[f] && (this.fetched[f] = !0, (f = this.fetchLink(f)) && this.parseData(f, c)) } }, fetchLink: function (a) { if (a = OpenLayers.Request.GET({ url: a, async: !1 })) return a.responseText }, parseStyles: function (a, b) { for (var c = 0, d = a.length; c < d; c++) { var e = this.parseStyle(a[c]); e && (this.styles[(b.styleBaseUrl || "") + "#" + e.id] = e) } }, parseKmlColor: function (a) {
                         var b =
                             null; a && (a = a.match(this.regExes.kmlColor)) && (b = { color: "#" + a[4] + a[3] + a[2], opacity: parseInt(a[1], 16) / 255 }); return b
                     }, parseStyle: function (a) {
@@ -411,10 +388,10 @@
                                 d); break; case "polystyle": d = this.parseProperty(e, "*", "color"); if (d = this.parseKmlColor(d)) b.fillOpacity = d.opacity, b.fillColor = d.color; "0" == this.parseProperty(e, "*", "fill") && (b.fillColor = "none"); "0" == this.parseProperty(e, "*", "outline") && (b.strokeWidth = "0"); break; case "iconstyle": var h = parseFloat(this.parseProperty(e, "*", "scale") || 1); d = 32 * h; var i = 32 * h, j = this.getElementsByTagNameNS(e, "*", "Icon")[0]; if (j) {
                                     var k = this.parseProperty(j, "*", "href"); if (k) {
                                         var l = this.parseProperty(j, "*", "w"), m = this.parseProperty(j,
-                                            "*", "h"); OL.String.startsWith(k, "http://maps.google.com/mapfiles/kml") && (!l && !m) && (m = l = 64, h /= 2); l = l || m; m = m || l; l && (d = parseInt(l) * h); m && (i = parseInt(m) * h); if (m = k.match(this.regExes.kmlIconPalette)) l = m[1], m = m[2], k = this.parseProperty(j, "*", "x"), j = this.parseProperty(j, "*", "y"), k = "http://maps.google.com/mapfiles/kml/pal" + l + "/icon" + (8 * (j ? 7 - j / 32 : 7) + (k ? k / 32 : 0)) + m; b.graphicOpacity = 1; b.externalGraphic = k
+                                            "*", "h"); OpenLayers.String.startsWith(k, "http://maps.google.com/mapfiles/kml") && (!l && !m) && (m = l = 64, h /= 2); l = l || m; m = m || l; l && (d = parseInt(l) * h); m && (i = parseInt(m) * h); if (m = k.match(this.regExes.kmlIconPalette)) l = m[1], m = m[2], k = this.parseProperty(j, "*", "x"), j = this.parseProperty(j, "*", "y"), k = "http://maps.google.com/mapfiles/kml/pal" + l + "/icon" + (8 * (j ? 7 - j / 32 : 7) + (k ? k / 32 : 0)) + m; b.graphicOpacity = 1; b.externalGraphic = k
                                     }
                                 } if (e = this.getElementsByTagNameNS(e, "*", "hotSpot")[0]) k = parseFloat(e.getAttribute("x")), j = parseFloat(e.getAttribute("y")),
-                                    l = e.getAttribute("xunits"), "pixels" == l ? b.graphicXOffset = -k * h : "insetPixels" == l ? b.graphicXOffset = -d + k * h : "fraction" == l && (b.graphicXOffset = -d * k), e = e.getAttribute("yunits"), "pixels" == e ? b.graphicYOffset = -i + j * h + 1 : "insetPixels" == e ? b.graphicYOffset = -(j * h) + 1 : "fraction" == e && (b.graphicYOffset = -i * (1 - j) + 1); b.graphicWidth = d; b.graphicHeight = i; break; case "balloonstyle": (e = OL.Util.getXmlNodeValue(e)) && (b.balloonStyle = e.replace(this.regExes.straightBracket, "${$1}")); break; case "labelstyle": if (d = this.parseProperty(e,
+                                    l = e.getAttribute("xunits"), "pixels" == l ? b.graphicXOffset = -k * h : "insetPixels" == l ? b.graphicXOffset = -d + k * h : "fraction" == l && (b.graphicXOffset = -d * k), e = e.getAttribute("yunits"), "pixels" == e ? b.graphicYOffset = -i + j * h + 1 : "insetPixels" == e ? b.graphicYOffset = -(j * h) + 1 : "fraction" == e && (b.graphicYOffset = -i * (1 - j) + 1); b.graphicWidth = d; b.graphicHeight = i; break; case "balloonstyle": (e = OpenLayers.Util.getXmlNodeValue(e)) && (b.balloonStyle = e.replace(this.regExes.straightBracket, "${$1}")); break; case "labelstyle": if (d = this.parseProperty(e,
                                         "*", "color"), d = this.parseKmlColor(d)) b.fontColor = d.color, b.fontOpacity = d.opacity
                         }!b.strokeColor && b.fillColor && (b.strokeColor = b.fillColor); if ((a = a.getAttribute("id")) && b) b.id = a; return b
                     }, parseStyleMaps: function (a, b) {
@@ -425,14 +402,14 @@
                     }, parseFeatures: function (a, b) {
                         for (var c = [], d = 0, e = a.length; d < e; d++) {
                             var f = a[d], g = this.parseFeature.apply(this, [f]); if (g) {
-                            this.extractStyles && (g.attributes && g.attributes.styleUrl) && (g.style = this.getStyle(g.attributes.styleUrl, b)); if (this.extractStyles) { var h = this.getElementsByTagNameNS(f, "*", "Style")[0]; if (h && (h = this.parseStyle(h))) g.style = OL.Util.extend(g.style, h) } if (this.extractTracks) {
+                            this.extractStyles && (g.attributes && g.attributes.styleUrl) && (g.style = this.getStyle(g.attributes.styleUrl, b)); if (this.extractStyles) { var h = this.getElementsByTagNameNS(f, "*", "Style")[0]; if (h && (h = this.parseStyle(h))) g.style = OpenLayers.Util.extend(g.style, h) } if (this.extractTracks) {
                                 if ((f = this.getElementsByTagNameNS(f, this.namespaces.gx, "Track")) && 0 < f.length) g = { features: [], feature: g },
                                     this.readNode(f[0], g), 0 < g.features.length && c.push.apply(c, g.features)
                             } else c.push(g)
                             } else throw "Bad Placemark: " + d;
                         } this.features = this.features.concat(c)
                     }, readers: {
-                        kml: { when: function (a, b) { b.whens.push(OL.Date.parse(this.getChildValue(a))) }, _trackPointAttribute: function (a, b) { var c = a.nodeName.split(":").pop(); b.attributes[c].push(this.getChildValue(a)) } }, gx: {
+                        kml: { when: function (a, b) { b.whens.push(OpenLayers.Date.parse(this.getChildValue(a))) }, _trackPointAttribute: function (a, b) { var c = a.nodeName.split(":").pop(); b.attributes[c].push(this.getChildValue(a)) } }, gx: {
                             Track: function (a, b) {
                                 var c = { whens: [], points: [], angles: [] }; if (this.trackAttributes) {
                                     var d; c.attributes = {}; for (var e = 0, f = this.trackAttributes.length; e <
@@ -442,39 +419,39 @@
                                         h = b.feature.clone(); h.fid = b.feature.fid || b.feature.id; i = c.points[e]; h.geometry = i; "z" in i && (h.attributes.altitude = i.z); this.internalProjection && this.externalProjection && h.geometry.transform(this.externalProjection, this.internalProjection); if (this.trackAttributes) { i = 0; for (var j = this.trackAttributes.length; i < j; ++i)h.attributes[d] = c.attributes[this.trackAttributes[i]][e] } h.attributes.when = c.whens[e]; h.attributes.trackId = b.feature.id; g && (i = c.angles[e], h.attributes.heading =
                                             parseFloat(i[0]), h.attributes.tilt = parseFloat(i[1]), h.attributes.roll = parseFloat(i[2])); b.features.push(h)
                                 }
-                            }, coord: function (a, b) { var c = this.getChildValue(a).replace(this.regExes.trimSpace, "").split(/\s+/), d = new OL.Geometry.Point(c[0], c[1]); 2 < c.length && (d.z = parseFloat(c[2])); b.points.push(d) }, angles: function (a, b) { var c = this.getChildValue(a).replace(this.regExes.trimSpace, "").split(/\s+/); b.angles.push(c) }
+                            }, coord: function (a, b) { var c = this.getChildValue(a).replace(this.regExes.trimSpace, "").split(/\s+/), d = new OpenLayers.Geometry.Point(c[0], c[1]); 2 < c.length && (d.z = parseFloat(c[2])); b.points.push(d) }, angles: function (a, b) { var c = this.getChildValue(a).replace(this.regExes.trimSpace, "").split(/\s+/); b.angles.push(c) }
                         }
                     }, parseFeature: function (a) {
                         for (var b = ["MultiGeometry", "Polygon", "LineString", "Point"],
-                            c, d, e, f = 0, g = b.length; f < g; ++f)if (c = b[f], this.internalns = a.namespaceURI ? a.namespaceURI : this.kmlns, d = this.getElementsByTagNameNS(a, this.internalns, c), 0 < d.length) { if (b = this.parseGeometry[c.toLowerCase()]) e = b.apply(this, [d[0]]), this.internalProjection && this.externalProjection && e.transform(this.externalProjection, this.internalProjection); else throw new TypeError("Unsupported geometry type: " + c); break } var h; this.extractAttributes && (h = this.parseAttributes(a)); c = new OL.Feature.Vector(e, h); a = a.getAttribute("id") ||
+                            c, d, e, f = 0, g = b.length; f < g; ++f)if (c = b[f], this.internalns = a.namespaceURI ? a.namespaceURI : this.kmlns, d = this.getElementsByTagNameNS(a, this.internalns, c), 0 < d.length) { if (b = this.parseGeometry[c.toLowerCase()]) e = b.apply(this, [d[0]]), this.internalProjection && this.externalProjection && e.transform(this.externalProjection, this.internalProjection); else throw new TypeError("Unsupported geometry type: " + c); break } var h; this.extractAttributes && (h = this.parseAttributes(a)); c = new OpenLayers.Feature.Vector(e, h); a = a.getAttribute("id") ||
                                 a.getAttribute("name"); null != a && (c.fid = a); return c
-                    }, getStyle: function (a, b) { var c = OL.Util.removeTail(a), d = OL.Util.extend({}, b); d.depth++; d.styleBaseUrl = c; !this.styles[a] && !OL.String.startsWith(a, "#") && d.depth <= this.maxDepth && !this.fetched[c] && (c = this.fetchLink(c)) && this.parseData(c, d); return OL.Util.extend({}, this.styles[a]) }, parseGeometry: {
+                    }, getStyle: function (a, b) { var c = OpenLayers.Util.removeTail(a), d = OpenLayers.Util.extend({}, b); d.depth++; d.styleBaseUrl = c; !this.styles[a] && !OpenLayers.String.startsWith(a, "#") && d.depth <= this.maxDepth && !this.fetched[c] && (c = this.fetchLink(c)) && this.parseData(c, d); return OpenLayers.Util.extend({}, this.styles[a]) }, parseGeometry: {
                         point: function (a) {
                             var b = this.getElementsByTagNameNS(a, this.internalns, "coordinates"), a = []; if (0 < b.length) var c = b[0].firstChild.nodeValue,
-                                c = c.replace(this.regExes.removeSpace, ""), a = c.split(","); b = null; if (1 < a.length) 2 == a.length && (a[2] = null), b = new OL.Geometry.Point(a[0], a[1], a[2]); else throw "Bad coordinate string: " + c; return b
+                                c = c.replace(this.regExes.removeSpace, ""), a = c.split(","); b = null; if (1 < a.length) 2 == a.length && (a[2] = null), b = new OpenLayers.Geometry.Point(a[0], a[1], a[2]); else throw "Bad coordinate string: " + c; return b
                         }, linestring: function (a, b) {
                             var c = this.getElementsByTagNameNS(a, this.internalns, "coordinates"), d = null; if (0 < c.length) {
                                 for (var c = this.getChildValue(c[0]), c = c.replace(this.regExes.trimSpace, ""), c = c.replace(this.regExes.trimComma, ","), d = c.split(this.regExes.splitSpace), e = d.length, f = Array(e), g, h, i = 0; i < e; ++i)if (g =
-                                    d[i].split(","), h = g.length, 1 < h) 2 == g.length && (g[2] = null), f[i] = new OL.Geometry.Point(g[0], g[1], g[2]); else throw "Bad LineString point coordinates: " + d[i]; if (e) d = b ? new OL.Geometry.LinearRing(f) : new OL.Geometry.LineString(f); else throw "Bad LineString coordinates: " + c;
+                                    d[i].split(","), h = g.length, 1 < h) 2 == g.length && (g[2] = null), f[i] = new OpenLayers.Geometry.Point(g[0], g[1], g[2]); else throw "Bad LineString point coordinates: " + d[i]; if (e) d = b ? new OpenLayers.Geometry.LinearRing(f) : new OpenLayers.Geometry.LineString(f); else throw "Bad LineString coordinates: " + c;
                             } return d
                         }, polygon: function (a) {
                             var a = this.getElementsByTagNameNS(a, this.internalns, "LinearRing"), b = a.length, c = Array(b); if (0 < b) for (var d = 0, e = a.length; d < e; ++d)if (b = this.parseGeometry.linestring.apply(this, [a[d], !0])) c[d] =
-                                b; else throw "Bad LinearRing geometry: " + d; return new OL.Geometry.Polygon(c)
-                        }, multigeometry: function (a) { for (var b, c = [], d = a.childNodes, e = 0, f = d.length; e < f; ++e)a = d[e], 1 == a.nodeType && (b = this.parseGeometry[(a.prefix ? a.nodeName.split(":")[1] : a.nodeName).toLowerCase()]) && c.push(b.apply(this, [a])); return new OL.Geometry.Collection(c) }
+                                b; else throw "Bad LinearRing geometry: " + d; return new OpenLayers.Geometry.Polygon(c)
+                        }, multigeometry: function (a) { for (var b, c = [], d = a.childNodes, e = 0, f = d.length; e < f; ++e)a = d[e], 1 == a.nodeType && (b = this.parseGeometry[(a.prefix ? a.nodeName.split(":")[1] : a.nodeName).toLowerCase()]) && c.push(b.apply(this, [a])); return new OpenLayers.Geometry.Collection(c) }
                     }, parseAttributes: function (a) {
                         var b = {}, c = a.getElementsByTagName("ExtendedData"); c.length && (b = this.parseExtendedData(c[0])); for (var d, e, f, a = a.childNodes, c = 0, g =
-                            a.length; c < g; ++c)if (d = a[c], 1 == d.nodeType && (e = d.childNodes, 1 <= e.length && 3 >= e.length)) { switch (e.length) { case 1: f = e[0]; break; case 2: f = e[0]; e = e[1]; f = 3 == f.nodeType || 4 == f.nodeType ? f : e; break; default: f = e[1] }if (3 == f.nodeType || 4 == f.nodeType) if (d = d.prefix ? d.nodeName.split(":")[1] : d.nodeName, f = OL.Util.getXmlNodeValue(f)) f = f.replace(this.regExes.trimSpace, ""), b[d] = f } return b
+                            a.length; c < g; ++c)if (d = a[c], 1 == d.nodeType && (e = d.childNodes, 1 <= e.length && 3 >= e.length)) { switch (e.length) { case 1: f = e[0]; break; case 2: f = e[0]; e = e[1]; f = 3 == f.nodeType || 4 == f.nodeType ? f : e; break; default: f = e[1] }if (3 == f.nodeType || 4 == f.nodeType) if (d = d.prefix ? d.nodeName.split(":")[1] : d.nodeName, f = OpenLayers.Util.getXmlNodeValue(f)) f = f.replace(this.regExes.trimSpace, ""), b[d] = f } return b
                     }, parseExtendedData: function (a) {
                         var b = {}, c, d, e, f, g = a.getElementsByTagName("Data"); c = 0; for (d = g.length; c < d; c++) {
                             e = g[c]; f = e.getAttribute("name");
                             var h = {}, i = e.getElementsByTagName("value"); i.length && (h.value = this.getChildValue(i[0])); this.kvpAttributes ? b[f] = h.value : (e = e.getElementsByTagName("displayName"), e.length && (h.displayName = this.getChildValue(e[0])), b[f] = h)
                         } a = a.getElementsByTagName("SimpleData"); c = 0; for (d = a.length; c < d; c++)h = {}, e = a[c], f = e.getAttribute("name"), h.value = this.getChildValue(e), this.kvpAttributes ? b[f] = h.value : (h.displayName = f, b[f] = h); return b
                     }, parseProperty: function (a, b, c) {
-                        var d, a = this.getElementsByTagNameNS(a, b, c); try { d = OL.Util.getXmlNodeValue(a[0]) } catch (e) {
+                        var d, a = this.getElementsByTagNameNS(a, b, c); try { d = OpenLayers.Util.getXmlNodeValue(a[0]) } catch (e) {
                             d =
                             null
                         } return d
-                    }, write: function (a) { OL.Util.isArray(a) || (a = [a]); for (var b = this.createElementNS(this.kmlns, "kml"), c = this.createFolderXML(), d = 0, e = a.length; d < e; ++d)c.appendChild(this.createPlacemarkXML(a[d])); b.appendChild(c); return OL.Format.XML.prototype.write.apply(this, [b]) }, createFolderXML: function () {
+                    }, write: function (a) { OpenLayers.Util.isArray(a) || (a = [a]); for (var b = this.createElementNS(this.kmlns, "kml"), c = this.createFolderXML(), d = 0, e = a.length; d < e; ++d)c.appendChild(this.createPlacemarkXML(a[d])); b.appendChild(c); return OpenLayers.Format.XML.prototype.write.apply(this, [b]) }, createFolderXML: function () {
                         var a = this.createElementNS(this.kmlns, "Folder"); if (this.foldersName) { var b = this.createElementNS(this.kmlns, "name"), c = this.createTextNode(this.foldersName); b.appendChild(c); a.appendChild(b) } this.foldersDesc &&
                             (b = this.createElementNS(this.kmlns, "description"), c = this.createTextNode(this.foldersDesc), b.appendChild(c), a.appendChild(b)); return a
                     }, createPlacemarkXML: function (a) {
@@ -503,15 +480,15 @@
     function Geometry() {
         //Converts to "normal" GPS coordinates
         this.ConvertTo4326 = function (lon, lat) {
-            let projI = new OL.Projection("EPSG:900913");
-            let projE = new OL.Projection("EPSG:4326");
-            return (new OL.LonLat(lon, lat)).transform(projI, projE);
+            let projI = new OpenLayers.Projection("EPSG:900913");
+            let projE = new OpenLayers.Projection("EPSG:4326");
+            return (new OpenLayers.LonLat(lon, lat)).transform(projI, projE);
         };
 
         this.ConvertTo900913 = function (lon, lat) {
-            let projI = new OL.Projection("EPSG:900913");
-            let projE = new OL.Projection("EPSG:4326");
-            return (new OL.LonLat(lon, lat)).transform(projE, projI);
+            let projI = new OpenLayers.Projection("EPSG:900913");
+            let projE = new OpenLayers.Projection("EPSG:4326");
+            return (new OpenLayers.LonLat(lon, lat)).transform(projE, projI);
         };
 
         //Converts the Longitudinal offset to an offset in 4326 gps coordinates
@@ -544,7 +521,7 @@
         /**
 		 * Checks if the given geometry point is on screen
          * @function WazeWrap.Geometry.isGeometryInMapExtent
-         * @param {OL.Geometry.Point} Geometry Point we are checking if it is in the extent
+         * @param {OpenLayers.Geometry.Point} Geometry Point we are checking if it is in the extent
          */
         this.isGeometryInMapExtent = function (geometry) {
             return geometry && geometry.getBounds &&
@@ -554,13 +531,13 @@
         /**
 		 * Calculates the distance between given points, returned in meters
          * @function WazeWrap.Geometry.calculateDistance
-         * @param {OL.Geometry.Point} An array of OL.Geometry.Point with which to measure the total distance. A minimum of 2 points is needed.
+         * @param {OpenLayers.Geometry.Point} An array of OpenLayers.Geometry.Point with which to measure the total distance. A minimum of 2 points is needed.
          */
         this.calculateDistance = function (pointArray) {
             if (pointArray.length < 2)
                 return 0;
 
-            let line = new OL.Geometry.LineString(pointArray);
+            let line = new OpenLayers.Geometry.LineString(pointArray);
             let length = line.getGeodesicLength(W.map.getProjectionObject());
             return length; //multiply by 3.28084 to convert to feet
         };
@@ -568,7 +545,7 @@
 		/**
 		 * Finds the closest on-screen drivable segment to the given point, ignoring PLR and PR segments if the options are set
 		 * @function WazeWrap.Geometry.findClosestSegment
-		 * @param {OL.Geometry.Point} The given point to find the closest segment to
+		 * @param {OpenLayers.Geometry.Point} The given point to find the closest segment to
 		 * @param {boolean} If true, Parking Lot Road segments will be ignored when finding the closest segment
 		 * @param {boolean} If true, Private Road segments will be ignored when finding the closest segment
 		**/
@@ -588,17 +565,18 @@
                 if (ignorePLR && segmentType === 20) //PLR
                     continue;
 
-                if (ignoreUnnamedPR)
-                    if (segmentType === 17 && WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID) === null) //PR
+                if (ignoreUnnamedPR && segmentType === 17) {
+                    var nm = WazeWrap.Model.getStreetName(onscreenSegments[s].attributes.primaryStreetID);
+                    if (nm === null || nm == "") //PR
                         continue;
-
+                }
 
                 let distanceToSegment = mygeometry.distanceTo(onscreenSegments[s].geometry, { details: true });
 
                 if (distanceToSegment.distance < minDistance) {
                     minDistance = distanceToSegment.distance;
                     closestSegment = onscreenSegments[s];
-                    closestSegment.closestPoint = new OL.Geometry.Point(distanceToSegment.x1, distanceToSegment.y1);
+                    closestSegment.closestPoint = new OpenLayers.Geometry.Point(distanceToSegment.x1, distanceToSegment.y1);
                 }
             }
             return closestSegment;
@@ -737,9 +715,9 @@
                 return $.Deferred(function (dfd) {
                     var resolve = function () {
                         dfd.resolve();
-                        W.vent.off('operationDone', resolve);
+                        W.app.layout.model.off('operationDone', resolve);
                     };
-                    W.vent.on('operationDone', resolve);
+                    W.app.layout.model.on('operationDone', resolve);
                 }).promise();
             };
 
@@ -840,7 +818,7 @@
                  * Gets the center of a segment in LonLat form.
                  * @private
                  * @param segment A Waze model segment object.
-                 * @return {OL.LonLat} The LonLat object corresponding to the
+                 * @return {OpenLayers.LonLat} The LonLat object corresponding to the
                  * center of the segment.
                  */
                 getSegmentCenterLonLat: function (segment) {
@@ -857,7 +835,7 @@
                             y = (segment.geometry.components[midPoint - 1].y +
                                 segment.geometry.components[midPoint].y) / 2;
                         }
-                        return new OL.Geometry.Point(x, y).
+                        return new OpenLayers.Geometry.Point(x, y).
                             transform(W.map.getProjectionObject(), 'EPSG:4326');
                     }
 
@@ -963,7 +941,7 @@
 		 * Returns the "normalized" (1 based) user rank/level
 		 */
         this.Rank = function () {
-            return W.loginManager.user.normalizedLevel;
+            return W.loginManager.user.rank + 1;
         };
 
 		/**
@@ -990,7 +968,7 @@
 
     function Require() {
         this.DragElement = function () {
-            var myDragElement = OL.Class({
+            var myDragElement = OpenLayers.Class({
                 started: !1,
                 stopDown: !0,
                 dragging: !1,
@@ -1003,27 +981,29 @@
                 timeoutId: null,
                 forced: !1,
                 active: !1,
+				viewPortDiv: null,
                 initialize: function (e) {
                     this.map = e,
-                        this.uniqueID = myDragElement.baseID--
+                        this.uniqueID = myDragElement.baseID--;
+						this.viewPortDiv = W.map.getViewport();
                 },
                 callback: function (e, t) {
                     if (this[e])
                         return this[e].apply(this, t)
                 },
                 dragstart: function (e) {
-                    e.xy = new OL.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1]);
+                    e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1]);
                     var t = !0;
                     return this.dragging = !1,
-                        (OL.Event.isLeftClick(e) || OL.Event.isSingleTouch(e)) && (this.started = !0,
+                        (OpenLayers.Event.isLeftClick(e) || OpenLayers.Event.isSingleTouch(e)) && (this.started = !0,
                             this.start = e.xy,
                             this.last = e.xy,
-                            OL.Element.addClass(this.map.viewPortDiv, "olDragDown"),
+                            OpenLayers.Element.addClass(this.viewPortDiv, "olDragDown"),
                             this.down(e),
                             this.callback("down", [e.xy]),
-                            OL.Event.stop(e),
-                            this.oldOnselectstart || (this.oldOnselectstart = document.onselectstart ? document.onselectstart : OL.Function.True),
-                            document.onselectstart = OL.Function.False,
+                            OpenLayers.Event.stop(e),
+                            this.oldOnselectstart || (this.oldOnselectstart = document.onselectstart ? document.onselectstart : OpenLayers.Function.True),
+                            document.onselectstart = OpenLayers.Function.False,
                             t = !this.stopDown),
                         t
                 },
@@ -1043,18 +1023,18 @@
                         return this.endDrag()
                 },
                 dragmove: function (e) {
-                    return this.map.viewPortDiv.offsets && (e.xy = new OL.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1])),
+                    return this.viewPortDiv.offsets && (e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1])),
                         this.lastMoveEvt = e,
-                        !this.started || this.timeoutId || e.xy.x === this.last.x && e.xy.y === this.last.y || (this.interval > 0 && (this.timeoutId = window.setTimeout(OL.Function.bind(this.removeTimeout, this), this.interval)),
+                        !this.started || this.timeoutId || e.xy.x === this.last.x && e.xy.y === this.last.y || (this.interval > 0 && (this.timeoutId = window.setTimeout(OpenLayers.Function.bind(this.removeTimeout, this), this.interval)),
                             this.dragging = !0,
                             this.move(e),
                             this.oldOnselectstart || (this.oldOnselectstart = document.onselectstart,
-                                document.onselectstart = OL.Function.False),
+                                document.onselectstart = OpenLayers.Function.False),
                             this.last = e.xy),
                         !0
                 },
                 dragend: function (e) {
-                    if (e.xy = new OL.Pixel(e.clientX - this.map.viewPortDiv.offsets[0], e.clientY - this.map.viewPortDiv.offsets[1]),
+                    if (e.xy = new OpenLayers.Pixel(e.clientX - this.viewPortDiv.offsets[0], e.clientY - this.viewPortDiv.offsets[1]),
                         this.started) {
                         var t = this.start !== this.last;
                         this.endDrag(),
@@ -1068,7 +1048,7 @@
                     this.started = !1,
                         this.dragging = !1,
                         this.forced = !1,
-                        OL.Element.removeClass(this.map.viewPortDiv, "olDragDown"),
+                        OpenLayers.Element.removeClass(this.viewPortDiv, "olDragDown"),
                         document.onselectstart = this.oldOnselectstart
                 },
                 down: function (e) { },
@@ -1115,7 +1095,7 @@
                 activate: function (e) {
                     this.$el = e,
                         this.active = !0;
-                    var t = $(this.map.viewPortDiv);
+                    var t = $(this.viewPortDiv);
                     return this.$el.on("mousedown.drag-" + this.uniqueID, $.proxy(this.mousedown, this)),
                         this.$el.on("touchstart.drag-" + this.uniqueID, $.proxy(this.touchstart, this)),
                         t.on("mouseup.drag-" + this.uniqueID, $.proxy(this.mouseup, this)),
@@ -1126,17 +1106,17 @@
                 deactivate: function () {
                     return this.active = !1,
                         this.$el.off(".drag-" + this.uniqueID),
-                        $(this.map.viewPortDiv).off(".drag-" + this.uniqueID),
+                        $(this.viewPortDiv).off(".drag-" + this.uniqueID),
                         this.touch = !1,
                         this.started = !1,
                         this.forced = !1,
                         this.dragging = !1,
                         this.start = null,
                         this.last = null,
-                        OL.Element.removeClass(this.map.viewPortDiv, "olDragDown")
+                        OpenLayers.Element.removeClass(this.viewPortDiv, "olDragDown")
                 },
                 adjustXY: function (e) {
-                    var t = OL.Util.pagePosition(this.map.viewPortDiv);
+                    var t = OpenLayers.Util.pagePosition(this.viewPortDiv);
                     return e.xy.x -= t[0],
                         e.xy.y -= t[1]
                 },
@@ -1146,7 +1126,7 @@
             return myDragElement;
         };
 
-        this.DivIcon = OL.Class({
+        this.DivIcon = OpenLayers.Class({
             className: null,
             $div: null,
             events: null,
@@ -1206,7 +1186,47 @@
             },
             CLASS_NAME: "W.DivIcon"
         });
-    }
+    
+		this.Icon = OpenLayers.Class({
+            url: null,
+            size: null,
+            offset: null,
+            calculateOffset: null,
+            imageDiv: null,
+            px: null,
+            initialize: function(a,b,c,d){
+                this.url=a;
+                this.size=b||{w: 20,h: 20};
+                this.offset=c||{x: -(this.size.w/2),y: -(this.size.h/2)};
+                this.calculateOffset=d;
+                a = OpenLayers.Util.createUniqueID("OL_Icon_");
+                var div = this.imageDiv = OpenLayers.Util.createAlphaImageDiv(a);
+                $(div.firstChild).removeClass('olAlphaImg');   // LEAVE THIS LINE TO PREVENT WME-HARDHATS SCRIPT FROM TURNING ALL ICONS INTO HARDHAT WAZERS --MAPOMATIC
+            },
+            destroy: function(){ this.erase();OpenLayers.Event.stopObservingElement(this.imageDiv.firstChild);this.imageDiv.innerHTML="";this.imageDiv=null; },
+            clone: function(){ return new OpenLayers.Icon(this.url,this.size,this.offset,this.calculateOffset); },
+            setSize: function(a){ null!==a&&(this.size=a); this.draw(); },
+            setUrl: function(a){ null!==a&&(this.url=a); this.draw(); },
+            draw: function(a){
+                OpenLayers.Util.modifyAlphaImageDiv(this.imageDiv,null,null,this.size,this.url,"absolute");
+                this.moveTo(a);
+                return this.imageDiv;
+            },
+            erase: function(){ null!==this.imageDiv&&null!==this.imageDiv.parentNode && OpenLayers.Element.remove(this.imageDiv); },
+            setOpacity: function(a){ OpenLayers.Util.modifyAlphaImageDiv(this.imageDiv,null,null,null,null,null,null,null,a); },
+            moveTo: function(a){
+                null!==a&&(this.px=a);
+                null!==this.imageDiv&&(null===this.px?this.display(!1): (
+                    this.calculateOffset&&(this.offset=this.calculateOffset(this.size)),
+                    OpenLayers.Util.modifyAlphaImageDiv(this.imageDiv,null,{x: this.px.x+this.offset.x,y: this.px.y+this.offset.y})
+                ));
+            },
+            display: function(a){ this.imageDiv.style.display=a?"": "none"; },
+            isDrawn: function(){ return this.imageDiv&&this.imageDiv.parentNode&&11!=this.imageDiv.parentNode.nodeType; },
+            CLASS_NAME: "OpenLayers.Icon"
+        });
+
+	}
 
     function Util() {
         /**
@@ -1243,12 +1263,13 @@
          */
         this.mapReady = function () {
             var mapReady = true;
-            W.vent.on('operationPending', function () {
+            W.app.layout.model.on('operationPending', function () {
                 mapReady = false;
             });
-            W.vent.on('operationDone', function () {
+            W.app.layout.model.on('operationDone', function () {
                 mapReady = true;
             });
+
             return function () {
                 return mapReady;
             };
@@ -1276,9 +1297,9 @@
 		/**
 		 * Returns orthogonalized geometry for the given geometry and threshold
 		 * @function WazeWrap.Util.OrthogonalizeGeometry
-		 * @param {OL.Geometry} The OL.Geometry to orthogonalize
+		 * @param {OpenLayers.Geometry} The OpenLayers.Geometry to orthogonalize
 		 * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
-		 * @return {OL.Geometry } Orthogonalized geometry
+		 * @return {OpenLayers.Geometry } Orthogonalized geometry
 		**/
         this.OrthogonalizeGeometry = function (geometry, threshold = 12) {
             let nomthreshold = threshold, // degrees within right or straight to alter
@@ -1288,7 +1309,7 @@
             function Orthogonalize() {
                 var nodes = geometry,
                     points = nodes.slice(0, -1).map(function (n) {
-                        let p = n.clone().transform(new OL.Projection("EPSG:900913"), new OL.Projection("EPSG:4326"));
+                        let p = n.clone().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
                         p.y = lat2latp(p.y);
                         return p;
                     }),
@@ -1312,7 +1333,7 @@
 
                     var n = points[corner.i];
                     n.y = latp2lat(n.y);
-                    let pp = n.transform(new OL.Projection("EPSG:4326"), new OL.Projection("EPSG:900913"));
+                    let pp = n.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
 
                     let id = nodes[corner.i].id;
                     for (i = 0; i < nodes.length; i++) {
@@ -1327,7 +1348,7 @@
                 } else {
                     var best,
                         originalPoints = nodes.slice(0, -1).map(function (n) {
-                            let p = n.clone().transform(new OL.Projection("EPSG:900913"), new OL.Projection("EPSG:4326"));
+                            let p = n.clone().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
                             p.y = lat2latp(p.y);
                             return p;
                         });
@@ -1356,7 +1377,7 @@
                         if (originalPoints[i].x !== points[i].x || originalPoints[i].y !== points[i].y) {
                             let n = points[i];
                             n.y = latp2lat(n.y);
-                            let pp = n.transform(new OL.Projection("EPSG:4326"), new OL.Projection("EPSG:900913"));
+                            let pp = n.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
 
                             let id = nodes[i].id;
                             for (j = 0; j < nodes.length; j++) {
@@ -1478,7 +1499,7 @@
 
             this.isDisabled = function (nodes) {
                 let points = nodes.slice(0, -1).map(function (n) {
-                    let p = n.toLonLat().transform(new OL.Projection("EPSG:900913"), new OL.Projection("EPSG:4326"));
+                    let p = n.toLonLat().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
                     return { x: p.lat, y: p.lon };
                 });
 
@@ -1491,9 +1512,9 @@
 		/**
 		 * Returns the general location of the segment queried
 		 * @function WazeWrap.Util.findSegment
-		 * @param {OL.Geometry} The server to search on. The current server can be obtained from W.app.getAppRegionCode()
+		 * @param {OpenLayers.Geometry} The server to search on. The current server can be obtained from W.app.getAppRegionCode()
 		 * @param {integer} The segment ID to search for
-		 * @return {OL.Geometry.Point} A point at the general location of the segment, null if the segment is not found
+		 * @return {OpenLayers.Geometry.Point} A point at the general location of the segment, null if the segment is not found
 		**/
         this.findSegment = async function (server, segmentID) {
             let apiURL = location.origin;
@@ -1515,9 +1536,9 @@
                     let segGeoArea = response.editAreas.objects[0].geometry.coordinates[0];
                     let ringGeo = [];
                     for (let i = 0; i < segGeoArea.length - 1; i++)
-                        ringGeo.push(new OL.Geometry.Point(segGeoArea[i][0], segGeoArea[i][1]));
+                        ringGeo.push(new OpenLayers.Geometry.Point(segGeoArea[i][0], segGeoArea[i][1]));
                     if (ringGeo.length > 0) {
-                        let ring = new OL.Geometry.LinearRing(ringGeo);
+                        let ring = new OpenLayers.Geometry.LinearRing(ringGeo);
                         result = ring.getCentroid();
                     }
                 }
@@ -1532,9 +1553,9 @@
 		/**
 		 * Returns the location of the venue queried
 		 * @function WazeWrap.Util.findVenue
-		 * @param {OL.Geometry} The server to search on. The current server can be obtained from W.app.getAppRegionCode()
+		 * @param {OpenLayers.Geometry} The server to search on. The current server can be obtained from W.app.getAppRegionCode()
 		 * @param {integer} The venue ID to search for
-		 * @return {OL.Geometry.Point} A point at the location of the venue, null if the venue is not found
+		 * @return {OpenLayers.Geometry.Point} A point at the location of the venue, null if the venue is not found
 		**/
         this.findVenue = async function (server, venueID) {
             let apiURL = location.origin;
@@ -1553,7 +1574,7 @@
             try {
                 response = await $.get(`${apiURL + venueID}`);
                 if (response && response.venue) {
-                    result = new OL.Geometry.Point(response.venue.location.x, response.venue.location.y);
+                    result = new OpenLayers.Geometry.Point(response.venue.location.x, response.venue.location.y);
                 }
             }
             catch (err) {
@@ -1646,7 +1667,7 @@
 		 * @param {function} 
 		 * @param {object} 
 		 * @param {integer} The segment ID to search for
-		 * @return {OL.Geometry.Point} A point at the general location of the segment, null if the segment is not found
+		 * @return {OpenLayers.Geometry.Point} A point at the general location of the segment, null if the segment is not found
 		**/
         this.Shortcut = class Shortcut {
             constructor(name, desc, group, title, shortcut, callback, scope) {
@@ -1696,10 +1717,10 @@
 		* @private
 		*/
             doesEventExist() {
-                this.eventExists = 'undefined' !== typeof W.accelerators.events.listeners[this.name] &&
-                    W.accelerators.events.listeners[this.name].length > 0 &&
-                    this.callback === W.accelerators.events.listeners[this.name][0].func &&
-                    this.scope === W.accelerators.events.listeners[this.name][0].obj;
+                this.eventExists = 'undefined' !== typeof W.accelerators.events.dispatcher._events[this.name] &&
+                    W.accelerators.events.dispatcher._events[this.name].length > 0 &&
+                    this.callback === W.accelerators.events.dispatcher._events[this.name][0].func &&
+                    this.scope === W.accelerators.events.dispatcher._events[this.name][0].obj;
                 return this.eventExists;
             }
 
@@ -1851,8 +1872,7 @@
                     if (W.prefs) {
                         W.prefs.on('change:isImperial', function () { that.appendTab(); });
                     }
-                    W.app.modeController.model.bind('change:mode', function () { that.appendTab(); });
-                }
+                  }
             }
 
             append(content) {
@@ -1860,17 +1880,15 @@
             }
 
             appendTab() {
-                if (W.app.attributes.mode === 0) { /*Only in default mode */
-                    WazeWrap.Util.waitForElement(
-                        this.TAB_SELECTOR + ',' + this.CONTENT_SELECTOR,
-                        function () {
-                            $(this.TAB_SELECTOR).append(this.$tab);
-                            $(this.CONTENT_SELECTOR).first().append(this.$content);
-                            if (this.callback) {
-                                this.callback.call(this.context);
-                            }
-                        }, this);
-                }
+		    WazeWrap.Util.waitForElement(
+			this.TAB_SELECTOR + ',' + this.CONTENT_SELECTOR,
+			function () {
+			    $(this.TAB_SELECTOR).append(this.$tab);
+			    $(this.CONTENT_SELECTOR).first().append(this.$content);
+			    if (this.callback) {
+				this.callback.call(this.context);
+			    }
+			}, this);
             }
 
             clearContent() {
@@ -1894,7 +1912,6 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
-			debugger;
             group = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
@@ -1909,7 +1926,7 @@
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
 					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" + '(groupChecked ? 'checked' : '') + '>',
+					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
 					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
                     '</div>',
 					'</li></ul>'
@@ -1924,10 +1941,6 @@
                     let isParentChecked = (typeof sessionStorage[groupClass] == "undefined" ? true : sessionStorage[groupClass] == 'true');
                     CreateParentGroup(isParentChecked);  //create the group
                     sessionStorage[groupClass] = isParentChecked;
-
-                    W.app.modeController.model.bind('change:mode', function (model, modeId, context) { //make it reappear after changing modes
-                        CreateParentGroup((sessionStorage[groupClass] == 'true'));
-                    });
                 }
 
             var buildLayerItem = function (isChecked) {
@@ -1967,10 +1980,7 @@
                 });
             };
 
-            W.app.modeController.model.bind('change:mode', function (model, modeId, context) {
-                buildLayerItem((sessionStorage[normalizedText] == 'true'));
-            });
-            buildLayerItem(checked);
+             buildLayerItem(checked);
         };
 
 		/**
