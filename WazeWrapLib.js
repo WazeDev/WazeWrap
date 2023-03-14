@@ -27,10 +27,10 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.01.02.01";
+        WazeWrap.Version = "2023.03.14.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
-	    loadSettings();
+	loadSettings();
 	    if(W.map.events)
 		    wEvents = W.map.events;
 	    else
@@ -44,7 +44,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
-	    RestoreMissingWRule();
+	RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -92,6 +92,29 @@
 
         initializeScriptUpdateInterface();
         await initializeToastr();
+
+        // 5/22/2019 (mapomatic)
+        // Temporary workaround to get the address field on the place edit
+        // panel to update when the place is updated.  Can be removed if
+        // staff fixes it on their end.
+        try {
+            W.model.venues.on('objectschanged', venues => {
+                // Update venue address field display, if needed.
+                try {
+                    const features = WazeWrap.getSelectedFeatures();
+                    if (features.length === 1) {
+                        const venue = features[0].model;
+                        if (venues.includes(venue)) {
+                            $('#landmark-edit-general span.full-address').text(venue.getAddress().format());
+                        }
+                    }
+                } catch (ex) {
+                    console.error('WazeWrap error:', ex)
+                }
+            });
+        } catch (ex) {
+            // ignore if this doesn't work.
+        }
 
         WazeWrap.Ready = true;
 	    
@@ -1829,71 +1852,24 @@
 		 * @param {object} 
 		**/
         this.Tab = class Tab {
-            constructor(name, content, callback, context) {
-                this.TAB_SELECTOR = '#user-tabs ul.nav-tabs';
-                this.CONTENT_SELECTOR = '#user-info div.tab-content';
+            constructor(name, content, callback, labelText) {
                 this.callback = null;
                 this.$content = null;
-                this.context = null;
                 this.$tab = null;
+				this.$label = null;
 
-                let idName, i = 0;
+				if(labelText == "")
+					labelText == name;
+				
+				{this.$label, this.$tab} = W.userscripts.registerSidebarTab(name);
+				
+				this.$label.innerText = labelText;
+				this.$tab.innerHTML = content;
+				
+				this.$tab.addEventListener('element-connected', callback, {once:true});
 
-                if (name && 'string' === typeof name &&
-                    content && 'string' === typeof content) {
-                    if (callback && 'function' === typeof callback) {
-                        this.callback = callback;
-                        this.context = context || callback;
-                    }
-                    /* Sanitize name for html id attribute */
-                    idName = name.toLowerCase().replace(/[^a-z-_]/g, '');
-                    /* Make sure id will be unique on page */
-                    while (
-                        $('#sidepanel-' + (i ? idName + i : idName)).length > 0) {
-                        i++;
-                    }
-                    if (i)
-                        idName = idName + i;
-                    /* Create tab and content */
-                    this.$tab = $('<li/>')
-                        .append($('<a/>')
-                            .attr({
-                                'href': '#sidepanel-' + idName,
-                                'data-toggle': 'tab',
-                            })
-                            .text(name));
-                    this.$content = $('<div/>')
-                        .addClass('tab-pane')
-                        .attr('id', 'sidepanel-' + idName)
-                        .html(content);
-
-                    this.appendTab();
-                    let that = this;
-                    if (W.prefs) {
-                        W.prefs.on('change:isImperial', function () { that.appendTab(); });
-                    }
-                  }
             }
 
-            append(content) {
-                this.$content.append(content);
-            }
-
-            appendTab() {
-		    WazeWrap.Util.waitForElement(
-			this.TAB_SELECTOR + ',' + this.CONTENT_SELECTOR,
-			function () {
-			    $(this.TAB_SELECTOR).append(this.$tab);
-			    $(this.CONTENT_SELECTOR).first().append(this.$content);
-			    if (this.callback) {
-				this.callback.call(this.context);
-			    }
-			}, this);
-            }
-
-            clearContent() {
-                this.$content.empty();
-            }
 
             destroy() {
                 this.$tab.remove();
