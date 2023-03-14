@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.03.14.01";
+        WazeWrap.Version = "2023.01.02.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1855,26 +1855,19 @@
             constructor(name, content, callback, labelText) {
                 this.callback = null;
                 this.$content = null;
-                this.$tab = null;
-				this.$label = null;
 
 				if(labelText == "")
 					labelText == name;
 				
-				{this.$label, this.$tab} = W.userscripts.registerSidebarTab(name);
+				const {tabLabel, tabPane} = W.userscripts.registerSidebarTab(name);
 				
-				this.$label.innerText = labelText;
-				this.$tab.innerHTML = content;
+				tabLabel.innerText = labelText;
+				tabPane.innerHTML = content;
 				
-				this.$tab.addEventListener('element-connected', callback, {once:true});
+				tabPane.addEventListener('element-connected', callback, {once:true});
 
             }
 
-
-            destroy() {
-                this.$tab.remove();
-                this.$content.remove();
-            }
         }
 
 		/**
