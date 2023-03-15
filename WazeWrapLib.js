@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.03.14.01";
+        WazeWrap.Version = "2023.03.15.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -132,7 +132,7 @@
 			`<div id="changePIN" class="controls-container" style="display:${wwSettings.editorPIN !== "" ? "block" : "none"}"><button id="wwChangePIN">Change PIN</button></div>`,
 			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
 			].join(' '));
-		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
+		WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
 	}
 	
 	function postInterfaceSetup(){
