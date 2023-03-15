@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.03.15.02";
+        WazeWrap.Version = "2023.03.15.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1852,7 +1852,7 @@
 		 * @param {string} 
 		**/
         this.Tab = async function Tab(name, content, callback, labelText) {
-			if(labelText == "")
+			if(!labelText)
 				labelText = name;
 			
 			const {tabLabel, tabPane} = W.userscripts.registerSidebarTab(name);
