@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.03.14.04";
+        WazeWrap.Version = "2023.03.15.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -132,7 +132,7 @@
 			`<div id="changePIN" class="controls-container" style="display:${wwSettings.editorPIN !== "" ? "block" : "none"}"><button id="wwChangePIN">Change PIN</button></div>`,
 			'<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" /><label for="_cbShowAlertHistory">Show alerts history</label></div>'
 			].join(' '));
-		new WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup);
+		WazeWrap.Interface.Tab('WW', $section.html(), postInterfaceSetup, 'WazeWrap');
 	}
 	
 	function postInterfaceSetup(){
@@ -1852,12 +1852,12 @@
 		 * @param {string} 
 		**/
         this.Tab = async function Tab(name, content, callback, labelText) {
-			if(labelText == "")
+			if(!labelText)
 				labelText = name;
 			
 			const {tabLabel, tabPane} = W.userscripts.registerSidebarTab(name);
 			
-			tabLabel.innerText = labelText;
+			tabLabel.innerHTML = labelText;
 			tabPane.innerHTML = content;
 			
 			await W.userscripts.waitForElementConnected(tabPane);
