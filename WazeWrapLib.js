@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.04.24.01";
+        WazeWrap.Version = "2023.04.24.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2066,6 +2066,7 @@
             #downloadUrl;
             #metaUrl;
             #metaRegExp;
+            #GM_xmlhttpRequest;
             #intervalChecker = null;
     
             /**
@@ -2073,6 +2074,8 @@
              * @param {string} scriptName The name of your script. Used as the alert title and in console error messages.
              * @param {string|number} currentVersion The current installed version of the script.
              * @param {string} downloadUrl The download URL of the script. If using Greasy Fork, the URL should end with ".user.js".
+             * @param {object} GM_xmlhttpRequest A reference to the GM_xmlhttpRequest function used by your script.
+             * This is used to obtain the latest script version number from the server.
              * @param {string} [metaUrl] The URL to a page containing the latest script version number.
              * Optional for Greasy Fork scripts (uses download URL path, replacing ".user.js" with ".meta.js").
              * @param {RegExp} [metaRegExp] A regular expression with a single capture group to extract the
@@ -2080,10 +2083,11 @@
              * Ignored if metaUrl is a falsy value.
              * @memberof ScriptUpdateMonitor
              */
-            constructor(scriptName, currentVersion, downloadUrl, metaUrl = null, metaRegExp = null) {
+            constructor(scriptName, currentVersion, downloadUrl, GM_xmlhttpRequest, metaUrl = null, metaRegExp = null) {
                 this.#scriptName = scriptName;
                 this.#currentVersion = currentVersion;
                 this.#downloadUrl = downloadUrl;
+                this.#GM_xmlhttpRequest = GM_xmlhttpRequest;
                 this.#metaUrl = metaUrl;
                 this.#metaRegExp = metaRegExp || /@version\s+(.+)/i;
                 this.#validateParameters();
@@ -2093,13 +2097,17 @@
              * Starts checking for script updates at a specified interval.
              *
              * @memberof ScriptUpdateMonitor
-             * @param {number} [intervalMinutes = 60] The interval (in minutes) to check for script updates. Default is 60.
+             * @param {number} [intervalHours = 2] The interval, in hours, to check for script updates. Default is 2. Minimum is 1.
              * @param {boolean} [checkImmediately = true] If true, checks for a script update immediately when called. Default is true.
              */
-            start(intervalMinutes = 60, checkImmediately = true) {
+            start(intervalHours = 2, checkImmediately = true) {
+                if (intervalHours < 1) {
+                    throw new Error('Parameter intervalHours must be at least 1');
+                }
                 if (!this.#intervalChecker) {
                     if (checkImmediately) this.#postAlertIfNewReleaseAvailable();
-                    this.#intervalChecker = setInterval(this.#postAlertIfNewReleaseAvailable, intervalMinutes * 60 * 1000);
+                    // Use the arrow function here to bind the "this" context to the ScriptUpdateMonitor object.
+                    this.#intervalChecker = setInterval(() => this.#postAlertIfNewReleaseAvailable(), intervalHours * 60 * 60 * 1000);
                 }
             }
     
@@ -2156,11 +2164,11 @@
                 const metaUrl = this.#metaUrl;
                 const metaRegExp = this.#metaRegExp;
                 return new Promise((resolve, reject) => {
-                    GM_xmlhttpRequest({
+                    this.#GM_xmlhttpRequest({
                         url: metaUrl,
                         onload(res) {
                             const versionMatch = res.responseText.match(metaRegExp);
-                            if (!versionMatch?.length === 2) {
+                            if (versionMatch?.length !== 2) {
                                 throw new Error(`Invalid RegExp expression (${metaRegExp}) or version # could not be found at this URL: ${metaUrl}`);
                             }
                             resolve(res.responseText.match(metaRegExp)[1]);
