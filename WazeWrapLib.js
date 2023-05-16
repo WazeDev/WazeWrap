@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.04.27.01";
+        WazeWrap.Version = "2023.05.16.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -35,24 +35,6 @@
 		    wEvents = W.map.events;
 	    else
 		    wEvents = W.map.getMapEventsListener();
-
-        // 3/29/2023 (mapomatic)
-        // Temporary workaround for missing "feature.model" property.
-        // Remove once "feature.attributes.repositoryObject" hits production WME
-        // and people have had time to update their code.
-        try {
-            W.selectionManager.getSelectedFeatures = () => {
-                const features = W.selectionManager._selectedFeatures.concat();
-                features.forEach(feature => {
-                    if (feature.attributes?.repositoryObject && !feature.model) {
-                        feature.model = feature.attributes.repositoryObject;
-                    }
-                });
-                return features;
-            }
-        } catch (ex) {
-            // ignore if this doesn't work for some reason.
-        }
 
         //SetUpRequire();
         wEvents.register("moveend", this, RestoreMissingSegmentFunctions);
