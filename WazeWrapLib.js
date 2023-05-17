@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.05.16.01";
+        WazeWrap.Version = "2023.05.16.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -79,15 +79,15 @@
         };
 
         WazeWrap.hasPlaceSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].model.type === "venue");
+            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "venue");
         };
 
         WazeWrap.hasSegmentSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].model.type === "segment");
+            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "segment");
         };
 
         WazeWrap.hasMapCommentSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].model.type === "mapComment");
+            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "mapComment");
         };
 
         initializeScriptUpdateInterface();
@@ -103,7 +103,7 @@
                 try {
                     const features = WazeWrap.getSelectedFeatures();
                     if (features.length === 1) {
-                        const venue = features[0].model;
+                        const venue = features[0].attributes.repositoryObject;
                         if (venues.includes(venue)) {
                             $('#landmark-edit-general span.full-address').text(venue.getAddress().format());
                         }
