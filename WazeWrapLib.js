@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.05.16.02";
+        WazeWrap.Version = "2023.06.13.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -654,10 +654,10 @@
 		 * @param {Segment object (Waze/Feature/Vector/Segment)} The roundabout segment
 		**/
         this.getAllRoundaboutSegmentsFromObj = function (segObj) {
-            if (segObj.model.attributes.junctionID === null)
+            if (segObj.attributes.repositoryObject.attributes.junctionID === null)
                 return null;
 
-            return W.model.junctions.objects[segObj.model.attributes.junctionID].attributes.segIDs;
+            return W.model.junctions.objects[segObj.attributes.repositoryObject.attributes.junctionID].attributes.segIDs;
         };
 
 		/**
@@ -689,7 +689,7 @@
 		 * @param {Segment object (Waze/Feature/Vector/Segment)} The segment object to check
 		**/
         this.isRoundaboutSegmentObj = function (segObj) {
-            return segObj.model.attributes.junctionID !== null;
+            return segObj.attributes.repositoryObject.attributes.junctionID !== null;
         };
 
 		/**
