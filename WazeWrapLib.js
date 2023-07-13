@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.06.13.01";
+        WazeWrap.Version = "2023.07.13.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -58,8 +58,23 @@
 	    WazeWrap.Remote = new Remote();
 
         WazeWrap.getSelectedFeatures = function () {
-            return W.selectionManager.getSelectedFeatures();
+			let arr = W.selectionManager.getSelectedFeatures();
+			//inject functions for pulling information since WME backend is receiving frequent changes
+			arr.forEach((item, index, array) => { 
+				array[index].WW = {};
+				array[index].WW.getObjectModel = function(){ return this.attributes.wazeFeature._wmeObject;};
+				array[index].WW.getType = function(){return this.getObjectModel().type;}; 
+				array[index].WW.getAttributes = function(){return this.getObjectModel().attributes;}; 
+			});
+            return arr;
         };
+		
+		WazeWrap.getSelectedDataModelObjects = function(){
+			if(typeof W.selectionManager.getSelectedDataModelObjects === 'function')
+				return W.selectionManager.getSelectedDataModelObjects();
+			else
+				return WazeWrap.getSelectedFeatures().map(e => e.WW.getObjectModel());
+		};
 
         WazeWrap.hasSelectedFeatures = function () {
             return W.selectionManager.hasSelectedFeatures();
@@ -79,15 +94,15 @@
         };
 
         WazeWrap.hasPlaceSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "venue");
+            return (W.selectionManager.hasSelectedFeatures() && WazeWrap.getSelectedFeatures()[0].WW.getType() === "venue");
         };
 
         WazeWrap.hasSegmentSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "segment");
+            return (W.selectionManager.hasSelectedFeatures() && WazeWrap.getSelectedFeatures()[0].WW.getType() === "segment");
         };
 
         WazeWrap.hasMapCommentSelected = function () {
-            return (W.selectionManager.hasSelectedFeatures() && W.selectionManager.getSelectedFeatures()[0].attributes.repositoryObject.type === "mapComment");
+            return (W.selectionManager.hasSelectedFeatures() && WazeWrap.getSelectedFeatures()[0].WW.getType() === "mapComment");
         };
 
         initializeScriptUpdateInterface();
@@ -101,9 +116,9 @@
             W.model.venues.on('objectschanged', venues => {
                 // Update venue address field display, if needed.
                 try {
-                    const features = WazeWrap.getSelectedFeatures();
+                    const features = WazeWrap.getSelectedDataModelObjects();
                     if (features.length === 1) {
-                        const venue = features[0].attributes.repositoryObject;
+                        const venue = features[0];
                         if (venues.includes(venue)) {
                             $('#landmark-edit-general span.full-address').text(venue.getAddress().format());
                         }
@@ -654,10 +669,15 @@
 		 * @param {Segment object (Waze/Feature/Vector/Segment)} The roundabout segment
 		**/
         this.getAllRoundaboutSegmentsFromObj = function (segObj) {
-            if (segObj.attributes.repositoryObject.attributes.junctionID === null)
+			let modelObj = {};
+			if(typeof WazeWrap.getSelectedFeatures()[0].WW !== 'undefined')
+				modelObj = segObj.WW.getObjectModel();
+			else
+				modelObj = segObj.attributes.wazeFeature._wmeObject;
+            if (modelObj.attributes.junctionID === null)
                 return null;
 
-            return W.model.junctions.objects[segObj.attributes.repositoryObject.attributes.junctionID].attributes.segIDs;
+            return W.model.junctions.objects[modelObj.attributes.junctionID].attributes.segIDs;
         };
 
 		/**
@@ -689,7 +709,12 @@
 		 * @param {Segment object (Waze/Feature/Vector/Segment)} The segment object to check
 		**/
         this.isRoundaboutSegmentObj = function (segObj) {
-            return segObj.attributes.repositoryObject.attributes.junctionID !== null;
+			let modelObj = {};
+			if(typeof WazeWrap.getSelectedFeatures()[0].WW !== 'undefined')
+				modelObj = segObj.WW.getObjectModel();
+			else
+				modelObj = segObj.attributes.wazeFeature._wmeObject;
+            return modelObj.attributes.junctionID !== null;
         };
 
 		/**
