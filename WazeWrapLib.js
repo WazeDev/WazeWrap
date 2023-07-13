@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.07.13.01";
+        WazeWrap.Version = "2023.07.13.02";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -662,6 +662,10 @@
         this.getStateNameFromSegmentObj = function (segObj) {
             return this.getStateName(segObj.attributes.primaryStreetID);
         };
+	    
+	this.getModelObj = function (obj){
+		return obj?.attributes?.wazeFeature?._wmeObject;
+	};
 
 		/**
 		 * Returns an array of segment IDs for all segments that make up the roundabout the given segment is part of
