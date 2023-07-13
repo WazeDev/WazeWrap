@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.07.13.02";
+        WazeWrap.Version = "2023.07.13.03";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -663,7 +663,7 @@
             return this.getStateName(segObj.attributes.primaryStreetID);
         };
 	    
-	this.getModelObj = function (obj){
+	this.getObjectModel = function (obj){
 		return obj?.attributes?.wazeFeature?._wmeObject;
 	};
 
