@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.07.13.03";
+        WazeWrap.Version = "2023.07.14.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -62,9 +62,9 @@
 			//inject functions for pulling information since WME backend is receiving frequent changes
 			arr.forEach((item, index, array) => { 
 				array[index].WW = {};
-				array[index].WW.getObjectModel = function(){ return this.attributes.wazeFeature._wmeObject;};
-				array[index].WW.getType = function(){return this.getObjectModel().type;}; 
-				array[index].WW.getAttributes = function(){return this.getObjectModel().attributes;}; 
+				array[index].WW.getObjectModel = function(){ return item.attributes.wazeFeature._wmeObject;};
+				array[index].WW.getType = function(){return item.WW.getObjectModel().type;}; 
+				array[index].WW.getAttributes = function(){return item.WW.getObjectModel().attributes;}; 
 			});
             return arr;
         };
