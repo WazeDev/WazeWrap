@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.07.17.02";
+        WazeWrap.Version = "2023.07.23.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1924,12 +1924,16 @@
                 let newLI = $('<li class="group">');
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
-					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
-					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
-                    '</div>',
-					'</li></ul>'
-                ].join(' '));
+                      // '<wz-button color="clear-icon" size="xs">',
+                      // '<i class="toggle-category w-icon w-icon-caret-down"></i>',
+                      // '</wz-button>',
+                      '<wz-toggle-switch disabled="false" class="' + groupClass + '" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + ' name value>',
+                      '</wz-toggle-switch>',
+                      '<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
+                      '</div>',
+                      '<ul class="collapsible-GROUP_' + group.toUpperCase() + '"></ul>',
+                      '</li>',
+                    ].join(' '));
 
                 groupList.append(newLI);
                 $('#' + groupClass).change(function () { sessionStorage[groupClass] = this.checked; });
