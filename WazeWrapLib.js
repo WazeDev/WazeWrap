@@ -378,7 +378,7 @@
             if (typeof W.model.segments.getObjectArray()[0].model.isTollRoad == "undefined")
                 W.model.segments.getObjectArray()[0].__proto__.isTollRoad = function () { return (this.attributes.fwdToll || this.attributes.revToll); };
             if (typeof W.model.segments.getObjectArray()[0].isLockedByHigherRank == "undefined")
-                W.model.segments.getObjectArray()[0].__proto__.isLockedByHigherRank = function () { return !(!this.attributes.lockRank || !this.model.loginManager.isLoggedIn()) && this.getLockRank() > this.model.loginManager.user.rank; };
+                W.model.segments.getObjectArray()[0].__proto__.isLockedByHigherRank = function () { return !(!this.attributes.lockRank || !this.model.loginManager.isLoggedIn()) && this.getLockRank() > this.model.loginManager.user.getRank(); };
             if (typeof W.model.segments.getObjectArray()[0].isDrivable == "undefined")
                 W.model.segments.getObjectArray()[0].__proto__.isDrivable = function () { let V = [5, 10, 16, 18, 19]; return !V.includes(this.attributes.roadType); };
             if (typeof W.model.segments.getObjectArray()[0].isWalkingRoadType == "undefined")
@@ -993,28 +993,33 @@
 		 * Returns the "normalized" (1 based) user rank/level
 		 */
         this.Rank = function () {
-            return W.loginManager.user.rank + 1;
+            return W.loginManager.user.getRank() + 1;
         };
 
 		/**
 		 * Returns the current user's username
 		 */
         this.Username = function () {
-            return W.loginManager.user.userName;
+            return W.loginManager.user.getUsername();
         };
 
 		/**
 		 * Returns if the user is a CM (in any country)
 		 */
         this.isCM = function () {
-            return W.loginManager.user.editableCountryIDs.length > 0
+            // Temporary fix for WME change. Going forward, the property will be under attributes.
+            if (W.loginManager.user.editableCountryIDs) {
+                return W.loginManager.user.editableCountryIDs.length > 0;
+            }
+            return W.loginManager.user.attributes.editableCountryIDs.length > 0
         };
 
 		/**
 		 * Returns if the user is an Area Manager (in any country)
 		 */
         this.isAM = function () {
-            return W.loginManager.user.isAreaManager;
+            // Temporary fix for WME change. Going forward, the property will be under attributes.
+            return W.loginManager.user.isAreaManager || W.loginManager.user.attributes.isAreaManager;
         };
     }
 
@@ -2222,7 +2227,7 @@
 			      	}
 			    }
 			xhr.send(JSON.stringify({
-			    userID: W.loginManager.user.id.toString(),
+			    userID: W.loginManager.user.getID().toString(),
 			    pin: wwSettings.editorPIN,
 			    script: scriptName,
 			    settings: scriptSettings
@@ -2270,7 +2275,7 @@
 				return null;
 			}
 			try{
-				let response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.id}/PIN/${wwSettings.editorPIN}/script/${script}`);
+				let response = await fetch(`https://wazedev.com/userID/${W.loginManager.user.getID()}/PIN/${wwSettings.editorPIN}/script/${script}`);
 				response = await response.json();
 				return response;
 			}
