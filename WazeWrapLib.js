@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.08.24.01";
+        WazeWrap.Version = "2023.09.17.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -246,12 +246,12 @@
                 $('<link/>', {
                     rel: 'stylesheet',
                     type: 'text/css',
-                    href: 'https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.css'
+                    href: 'https://cdn.statically.io/gh/WazeDev/toastr/master/build/toastr.min.css'
                 }),
                 $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
             );
 
-            await $.getScript('https://cdn.staticaly.com/gh/WazeDev/toastr/master/build/toastr.min.js');
+            await $.getScript('https://cdn.statically.io/gh/WazeDev/toastr/master/build/toastr.min.js');
 		wazedevtoastr.options = {
 		    target: '#map',
 		    timeOut: 6000,
