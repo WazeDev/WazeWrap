@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.09.17.01";
+        WazeWrap.Version = "2023.12.26.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2156,9 +2156,30 @@
             }
     
             async #postAlertIfNewReleaseAvailable() {
+                const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
                 let latestVersion;
                 try {
-                    latestVersion = await this.#fetchLatestReleaseVersion();
+                    let tries = 1;
+                    const maxTries = 3;
+                    while (tries <= maxTries) {
+                        latestVersion = await this.#fetchLatestReleaseVersion();
+                        if (latestVersion === 503) {
+                            // Greasy Fork returns a 503 error when too many requests are sent quickly.
+                            // Pause and try again.
+                            if (tries < maxTries) {
+                                console.log(`${this.#scriptName}: Checking for latest version again (retry #${tries})`);
+                                await sleep(1000);
+                            } else {
+                                console.error(`${this.#scriptName}: Failed to check latest version #. Too many 503 status codes returned.`);
+                            }
+                            tries += 1;
+                        } else if (latestVersion.status) {
+                            console.error(`${this.#scriptName}: Error while checking for latest version.`, latestVersion);
+                            return;
+                        } else {
+                            break;
+                        }
+                    }
                 } catch (ex) {
                     console.error(`${this.#scriptName}: Error while checking for latest version.`, ex);
                     return;
@@ -2183,11 +2204,17 @@
                     this.#GM_xmlhttpRequest({
                         url: metaUrl,
                         onload(res) {
-                            const versionMatch = res.responseText.match(metaRegExp);
-                            if (versionMatch?.length !== 2) {
-                                throw new Error(`Invalid RegExp expression (${metaRegExp}) or version # could not be found at this URL: ${metaUrl}`);
+                            if (res.status === 503) {
+                                resolve(503);
+                            } else if (res.status === 200) {
+                                const versionMatch = res.responseText.match(metaRegExp);
+                                if (versionMatch?.length !== 2) {
+                                    throw new Error(`Invalid RegExp expression (${metaRegExp}) or version # could not be found at this URL: ${metaUrl}`);
+                                }
+                                resolve(res.responseText.match(metaRegExp)[1]);
+                            } else {
+                                resolve(res);
                             }
-                            resolve(res.responseText.match(metaRegExp)[1]);
                         },
                         onerror(res) {
                             reject(res);
