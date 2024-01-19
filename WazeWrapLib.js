@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2023.12.26.01";
+        WazeWrap.Version = "2024.01.19.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2202,6 +2202,8 @@
                 const metaRegExp = this.#metaRegExp;
                 return new Promise((resolve, reject) => {
                     this.#GM_xmlhttpRequest({
+                        nocache: true,
+                        revalidate: true,
                         url: metaUrl,
                         onload(res) {
                             if (res.status === 503) {
