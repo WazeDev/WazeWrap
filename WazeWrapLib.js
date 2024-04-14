@@ -609,7 +609,7 @@
                         continue;
                 }
 
-                let distanceToSegment = mygeometry.distanceTo(onscreenSegments[s].geometry, { details: true });
+                let distanceToSegment = mygeometry.distanceTo(onscreenSegments[s].getOLGeometry(), { details: true });
 
                 if (distanceToSegment.distance < minDistance) {
                     minDistance = distanceToSegment.distance;
@@ -736,7 +736,7 @@
                     continue;
 
                 seg = W.model.segments.getObjectById(s);
-                if (mapExtent.intersectsBounds(seg.geometry.getBounds()))
+                if (mapExtent.intersectsBounds(seg.getOLGeometry().getBounds()))
                     onScreenSegments.push(seg);
             }
             return onScreenSegments;
@@ -876,16 +876,16 @@
                 getSegmentCenterLonLat: function (segment) {
                     var x, y, componentsLength, midPoint;
                     if (segment) {
-                        componentsLength = segment.geometry.components.length;
+                        componentsLength = segment.getOLGeometry().components.length;
                         midPoint = Math.floor(componentsLength / 2);
                         if (componentsLength % 2 === 1) {
-                            x = segment.geometry.components[midPoint].x;
-                            y = segment.geometry.components[midPoint].y;
+                            x = segment.getOLGeometry().components[midPoint].x;
+                            y = segment.getOLGeometry().components[midPoint].y;
                         } else {
-                            x = (segment.geometry.components[midPoint - 1].x +
-                                segment.geometry.components[midPoint].x) / 2;
-                            y = (segment.geometry.components[midPoint - 1].y +
-                                segment.geometry.components[midPoint].y) / 2;
+                            x = (segment.getOLGeometry().components[midPoint - 1].x +
+                                segment.getOLGeometry().components[midPoint].x) / 2;
+                            y = (segment.getOLGeometry().components[midPoint - 1].y +
+                                segment.getOLGeometry().components[midPoint].y) / 2;
                         }
                         return new OpenLayers.Geometry.Point(x, y).
                             transform(W.map.getProjectionObject(), 'EPSG:4326');
@@ -1590,7 +1590,7 @@
             try {
                 response = await $.get(`${apiURL + segmentID}`);
                 if (response && response.editAreas.objects.length > 0) {
-                    let segGeoArea = response.editAreas.objects[0].geometry.coordinates[0];
+                    let segGeoArea = response.editAreas.objects[0].getOLGeometry().coordinates[0];
                     let ringGeo = [];
                     for (let i = 0; i < segGeoArea.length - 1; i++)
                         ringGeo.push(new OpenLayers.Geometry.Point(segGeoArea[i][0], segGeoArea[i][1]));
