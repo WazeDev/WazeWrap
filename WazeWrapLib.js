@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2024.01.23.01";
+        WazeWrap.Version = "2024.04.15.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
