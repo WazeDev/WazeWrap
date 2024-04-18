@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2024.04.15.01";
+        WazeWrap.Version = "2024.04.17.01";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -1590,7 +1590,7 @@
             try {
                 response = await $.get(`${apiURL + segmentID}`);
                 if (response && response.editAreas.objects.length > 0) {
-                    let segGeoArea = response.editAreas.objects[0].getOLGeometry().coordinates[0];
+                    let segGeoArea = response.editAreas.objects[0].geometry.coordinates[0];
                     let ringGeo = [];
                     for (let i = 0; i < segGeoArea.length - 1; i++)
                         ringGeo.push(new OpenLayers.Geometry.Point(segGeoArea[i][0], segGeoArea[i][1]));
