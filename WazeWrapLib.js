@@ -2050,10 +2050,12 @@
             let options = {};
             if (disableTimeout)
                 options.timeOut = 0;
+            else if (timeOut)
+                options.timeOut = timeOut;
+
             if (disableClickToClose)
                 options.tapToDismiss = false;
-            if (!disableTimeout && timeOut)
-                options.timeOut = timeOut;
+                
             $(wazedevtoastr.info(message, scriptName, options)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
         }
 
