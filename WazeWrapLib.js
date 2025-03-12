@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2024.04.17.01";
+        WazeWrap.Version = "2025.03.12.00";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -2046,12 +2046,14 @@
             $(wazedevtoastr.success(message, scriptName)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
         }
 
-        this.info = function (scriptName, message, disableTimeout, disableClickToClose) {
+        this.info = function (scriptName, message, disableTimeout, disableClickToClose, timeOut) {
             let options = {};
             if (disableTimeout)
                 options.timeOut = 0;
             if (disableClickToClose)
                 options.tapToDismiss = false;
+            if (!disableTimeout && timeOut)
+                options.timeOut = timeOut;
             $(wazedevtoastr.info(message, scriptName, options)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
         }
 
