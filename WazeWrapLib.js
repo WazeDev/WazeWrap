@@ -27,7 +27,7 @@
 
     async function init() {
         console.log("WazeWrap initializing...");
-        WazeWrap.Version = "2025.03.12.01";
+        WazeWrap.Version = "2025.04.11.00";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
 		
 	loadSettings();
@@ -58,7 +58,7 @@
 	    WazeWrap.Remote = new Remote();
 
         WazeWrap.getSelectedFeatures = function () {
-			let arr = W.selectionManager.getSelectedFeatures();
+			let arr = W.selectionManager.getSelectedWMEFeatures();
 			//inject functions for pulling information since WME backend is receiving frequent changes
 			arr.forEach((item, index, array) => { 
 				array[index].WW = {};
