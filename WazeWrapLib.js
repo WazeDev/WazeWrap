@@ -1911,24 +1911,26 @@
 		 * @param {Layer object}
 		**/
         this.AddLayerCheckbox = function (group, checkboxText, checked, callback, layer) {
-            group = group.toLowerCase();
+            let groupLabel = group;
+	    group = group.toLowerCase();
             let normalizedText = checkboxText.toLowerCase().replace(/\s/g, '_');
             let checkboxID = "layer-switcher-item_" + normalizedText;
             let groupPrefix = 'layer-switcher-group_';
-            let groupClass = groupPrefix + group.toLowerCase();
+            let groupClass = groupPrefix + group;
             sessionStorage[normalizedText] = checked;
 
             let CreateParentGroup = function (groupChecked) {
                 let groupList = $('.layer-switcher').find('.list-unstyled.togglers');
-                let checkboxText = group.charAt(0).toUpperCase() + group.substr(1);
                 let newLI = $('<li class="group">');
                 newLI.html([
                     '<div class="layer-switcher-toggler-tree-category">',
-					'<i class="toggle-category w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
-					'<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
-					'<label class="label-text" for="' + groupClass + '">' + checkboxText + '</label>',
+		    '<i class="toggle-category w-icon w-icon-caret-down" data-group-id="GROUP_' + group.toUpperCase() + '"></i>',
+		    '<wz-toggle-switch class="' + groupClass + ' hydrated" id="' + groupClass + '" ' + (groupChecked ? 'checked' : '') + '>',
+		    '</wz-toggle-switch>',
+		    '<label class="label-text" for="' + groupClass + '">' + groupLabel + '</label>',
                     '</div>',
-					'</li></ul>'
+                    '<ul class="collapsible-GROUP_' + group.toUpperCase() + '">',
+	            '</ul></li>'
                 ].join(' '));
 
                 groupList.append(newLI);
