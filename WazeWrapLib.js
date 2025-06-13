@@ -44,7 +44,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
-	    RestoreMissingWRule();
+        RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
