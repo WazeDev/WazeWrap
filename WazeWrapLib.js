@@ -1567,21 +1567,21 @@
         };
 
         /**
-		 * Returns orthogonalized geometry for the given geometry and threshold
-		 * @function WazeWrap.Util.GeoJSONOrthogonalizeGeometry
-		 * @param {GeoJSON.Geometry} The OpenLayers.Geometry to orthogonalize
-		 * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
-		 * @return {GeoJSON.Geometry } Orthogonalized geometry
-		**/
+         * Returns orthogonalized geometry for the given geometry and threshold
+         * @function WazeWrap.Util.GeoJSONOrthogonalizeGeometry
+         * @param {GeoJSON.Geometry} The SDK/GeoJSON.Geometry to orthogonalize
+         * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
+         * @return {GeoJSON.Geometry } Orthogonalized geometry
+        **/
         this.GeoJSONOrthogonalizeGeometry = function (geometry, threshold = 12) {
-            let nomthreshold = threshold, // degrees within right or straight to alter
+            const nomthreshold = threshold, // degrees within right or straight to alter
                 lowerThreshold = Math.cos((90 - nomthreshold) * Math.PI / 180),
                 upperThreshold = Math.cos(nomthreshold * Math.PI / 180);
 
             function Orthogonalize() {
-                var nodes = geometry.coordinates,
-                    points = nodes.slice(0, -1).map(function (n) {
-                        let p = proj4("EPSG:900913", "EPSG:4326", n);
+                let nodes = geometry[0],
+                    points = nodes.slice(0, -1).map((n) => {
+                        const p = n;
                         p[1] = lat2latp(p[1]);
                         return p;
                     }),
@@ -1590,11 +1590,11 @@
                     i, j, score, motions;
 
                 // Triangle
-                if (nodes.length === 4) {
+                if (points.length === 4) {
                     for (i = 0; i < 1000; i++) {
                         motions = points.map(calcMotion);
 
-                        var tmp = addPoints(points[corner.i], motions[corner.i]);
+                        const tmp = addPoints(points[corner.i], motions[corner.i]);
                         points[corner.i][0] = tmp[0];
                         points[corner.i][1] = tmp[1];
 
@@ -1603,13 +1603,14 @@
                             break;
                     }
 
-                    var n = points[corner.i];
+                    const n = points[corner.i];
                     n[1] = latp2lat(n[1]);
-                    let pp = proj4("EPSG:4326", "EPSG:900913",n);
+                    const pp = n;
+                    // const pp = proj4("EPSG:4326", "EPSG:900913",n);
 
-                    let id = nodes[corner.i].id;
+                    const id = nodes[corner.i].id;
                     for (i = 0; i < nodes.length; i++) {
-                        if (nodes[i].id != id)
+                        if (nodes[i].id !== id)
                             continue;
 
                         nodes[i][0] = pp[0];
@@ -1617,67 +1618,67 @@
                     }
 
                     return nodes;
-                } else {
-                    var best,
-                        originalPoints = nodes.slice(0, -1).map(function (n) {
-                            let p = n.clone().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-                            p[1] = lat2latp(p[1]);
-                            return p;
-                        });
-                    score = Infinity;
-
-                    for (i = 0; i < 1000; i++) {
-                        motions = points.map(calcMotion);
-                        for (j = 0; j < motions.length; j++) {
-                            let tmp = addPoints(points[j], motions[j]);
-                            points[j][0] = tmp[0];
-                            points[j][1] = tmp[1];
-                        }
-                        var newScore = squareness(points);
-                        if (newScore < score) {
-                            best = [].concat(points);
-                            score = newScore;
-                        }
-                        if (score < epsilon)
-                            break;
-                    }
-
-                    points = best;
-
-                    for (i = 0; i < points.length; i++) {
-                        // only move the points that actually moved
-                        if (originalPoints[i][0] !== points[i][0] || originalPoints[i][1] !== points[i][1]) {
-                            let n = points[i];
-                            n[1] = latp2lat(n[1]);
-                            let pp = n.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
-
-                            let id = nodes[i].id;
-                            for (j = 0; j < nodes.length; j++) {
-                                if (nodes[j].id != id)
-                                    continue;
-
-                                nodes[j][0] = pp[0];
-                                nodes[j][1] = pp[1];
-                            }
-                        }
-                    }
-
-                    // remove empty nodes on straight sections
-                    for (i = 0; i < points.length; i++) {
-                        let dotp = normalizedDotProduct(i, points);
-                        if (dotp < -1 + epsilon) {
-                            id = nodes[i].id;
-                            for (j = 0; j < nodes.length; j++) {
-                                if (nodes[j].id != id)
-                                    continue;
-
-                                nodes[j] = false;
-                            }
-                        }
-                    }
-
-                    return nodes.filter(item => item !== false);
                 }
+                
+                let best,
+                    originalPoints = nodes.slice(0, -1).map((n) => {
+                        const p = n;
+                        p[1] = lat2latp(p[1]);
+                        return p;
+                    });
+                score = Number.POSITIVE_INFINITY;
+
+                for (i = 0; i < 1000; i++) {
+                    motions = points.map(calcMotion);
+                    for (j = 0; j < motions.length; j++) {
+                        const tmp = addPoints(points[j], motions[j]);
+                        points[j][0] = tmp[0];
+                        points[j][1] = tmp[1];
+                    }
+                    const newScore = squareness(points);
+                    if (newScore < score) {
+                        best = [].concat(points);
+                        score = newScore;
+                    }
+                    if (score < epsilon)
+                        break;
+                }
+
+                points = best;
+
+                for (i = 0; i < points.length; i++) {
+                    // only move the points that actually moved
+                    if (originalPoints[i][0] !== points[i][0] || originalPoints[i][1] !== points[i][1]) {
+                        const n = points[i];
+                        n[1] = latp2lat(n[1]);
+                        const pp = n;
+
+                        const id = nodes[i].id;
+                        for (j = 0; j < nodes.length; j++) {
+                            if (nodes[j].id !== id)
+                                continue;
+
+                            nodes[j][0] = pp[0];
+                            nodes[j][1] = pp[1];
+                        }
+                    }
+                }
+
+                // remove empty nodes on straight sections
+                for (i = 0; i < points.length; i++) {
+                    const dotp = normalizedDotProduct(i, points);
+                    if (dotp < -1 + epsilon) {
+                        id = nodes[i].id;
+                        for (j = 0; j < nodes.length; j++) {
+                            if (nodes[j].id !== id)
+                                continue;
+
+                            nodes[j] = false;
+                        }
+                    }
+                }
+
+                return nodes.filter(item => item !== false);
 
                 function calcMotion(b, i, array) {
                     let a = array[(i - 1 + array.length) % array.length],
@@ -1686,7 +1687,7 @@
                         q = subtractPoints(c, b),
                         scale, dotp;
 
-                    scale = 2 * Math.min(euclideanDistance(p, { x: 0, y: 0 }), euclideanDistance(q, { x: 0, y: 0 }));
+                    scale = 2 * Math.min(euclideanDistance(p, [0, 0]), euclideanDistance(q, [0, 0]));
                     p = normalizePoint(p, 1.0);
                     q = normalizePoint(q, 1.0);
 
@@ -1694,7 +1695,7 @@
 
                     // nasty hack to deal with almost-straight segments (angle is closer to 180 than to 90/270).
                     if (array.length > 3) {
-                        if (dotp < -0.707106781186547)
+                        if (dotp < -Math.SQRT1_2)
                             dotp += 1.0;
                     } else if (dotp && Math.abs(dotp) < corner.dotp) {
                         corner.i = i;
@@ -1714,7 +1715,7 @@
             }
 
             function squareness(points) {
-                return points.reduce(function (sum, val, i, array) {
+                return points.reduce((sum, _val, i, array) => {
                     let dotp = normalizedDotProduct(i, array);
 
                     dotp = filterDotProduct(dotp);
@@ -1736,21 +1737,21 @@
             }
 
             function subtractPoints(a, b) {
-                return { x: a[0] - b[0], y: a[1] - b[1] };
+                return [a[0] - b[0], a[1] - b[1]];
             }
 
             function addPoints(a, b) {
-                return { x: a[0] + b[0], y: a[1] + b[1] };
+                return [a[0] + b[0], a[1] + b[1]];
             }
 
             function euclideanDistance(a, b) {
-                let x = a[0] - b[0], y = a[1] - b[1];
+                const x = a[0] - b[0], y = a[1] - b[1];
                 return Math.sqrt((x * x) + (y * y));
             }
 
             function normalizePoint(point, scale) {
-                let vector = { x: 0, y: 0 };
-                let length = Math.sqrt(point[0] * point[0] + point[1] * point[1]);
+                const vector = [0, 0];
+                const length = Math.sqrt(point[0] * point[0] + point[1] * point[1]);
                 if (length !== 0) {
                     vector[0] = point[0] / length;
                     vector[1] = point[1] / length;
@@ -1769,10 +1770,10 @@
                 return 0;
             }
 
-            this.isDisabled = function (nodes) {
-                let points = nodes.slice(0, -1).map(function (n) {
-                    let p = n.toLonLat().transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));
-                    return { x: p.lat, y: p.lon };
+            this.isDisabled = (nodes) => {
+                const points = nodes.slice(0, -1).map((n) => {
+                    const p = n;
+                    return [p[0], p[1]];
                 });
 
                 return squareness(points);
