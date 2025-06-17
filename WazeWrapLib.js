@@ -1573,12 +1573,6 @@
          * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
          * @return {GeoJSON.Geometry } Orthogonalized geometry
         **/
-         * Returns orthogonalized geometry for the given geometry and threshold
-         * @function WazeWrap.Util.GeoJSONOrthogonalizeGeometry
-         * @param {GeoJSON.Geometry} The SDK/GeoJSON.Geometry to orthogonalize
-         * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
-         * @return {GeoJSON.Geometry } Orthogonalized geometry
-        **/
         this.GeoJSONOrthogonalizeGeometry = function (geometry, threshold = 12) {
             const nomthreshold = threshold, // degrees within right or straight to alter
                 lowerThreshold = Math.cos((90 - nomthreshold) * Math.PI / 180),
@@ -1656,12 +1650,6 @@
                         const n = points[i];
                         n[1] = latp2lat(n[1]);
                         const pp = n;
-                for (i = 0; i < points.length; i++) {
-                    // only move the points that actually moved
-                    if (originalPoints[i][0] !== points[i][0] || originalPoints[i][1] !== points[i][1]) {
-                        const n = points[i];
-                        n[1] = latp2lat(n[1]);
-                        const pp = n;
 
                         const id = nodes[i].toString();
                         for (j = 0; j < nodes.length; j++) {
@@ -1683,10 +1671,6 @@
                             if (nodes[j].toString() !== id)
                                 continue;
 
-                            nodes[j] = false;
-                        }
-                    }
-                }
                             nodes[j] = false;
                         }
                     }
