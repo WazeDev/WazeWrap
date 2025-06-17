@@ -619,39 +619,6 @@
             }
             return closestSegment;
         };
-        /**
-         * Finds the closest on-screen drivable segment to the given point, ignoring PLR and PR segments if the options are set
-         * @function WazeWrap.Geometry.findSDKClosestSegment
-         * @param {GeoJSON.Point} The given point to find the closest segment to
-         * @param {boolean} If true, Parking Lot Road segments will be ignored when finding the closest segment
-         * @param {boolean} If true, Private Road segments will be ignored when finding the closest segment
-         * @returns {Object} Returns an Object containing the Segment and Closest Point on the Segment
-        **/
-        this.findSDKClosestSegment = function (myPoint, ignorePLR, ignoreUnnamedPR) {
-            let minDistance = Number.POSITIVE_INFINITY;
-            let closestSegment;
-
-            for (const s of sdk.DataModel.Segments.getAll()) {
-                const segmentType = s.roadType;
-                if (segmentType === 10 || segmentType === 16 || segmentType === 18 || segmentType === 19 || (ignorePLR && segmentType === 20))
-                    continue;
-
-                if (ignoreUnnamedPR && segmentType === 17) {
-                    const primaryStreetId = s.primaryStreetId;
-                    const nm = sdk.DataModel.Streets.getById({streetId: primaryStreetId}).name;
-                    if (nm === null || nm.trim().length === 0) //PR
-                        continue;
-                }
-
-                const distanceToSegment = turf.pointToLineDistance(myPoint, s.geometry);
-
-                if (distanceToSegment < minDistance) {
-                    minDistance = distanceToSegment;
-                    closestSegment = {segment: s, closestPoint: turf.nearestPointOnLine(s.geometry, myPoint)};
-                }
-            }
-            return closestSegment;
-        };
     }
 
     function Model() {
