@@ -44,7 +44,7 @@
         RestoreMissingSegmentFunctions();
         RestoreMissingNodeFunctions();
         RestoreMissingOLKMLSupport();
-	    RestoreMissingWRule();
+        RestoreMissingWRule();
 
         WazeWrap.Geometry = new Geometry();
         WazeWrap.Model = new Model();
@@ -615,6 +615,39 @@
                     minDistance = distanceToSegment.distance;
                     closestSegment = onscreenSegments[s];
                     closestSegment.closestPoint = new OpenLayers.Geometry.Point(distanceToSegment.x1, distanceToSegment.y1);
+                }
+            }
+            return closestSegment;
+        };
+        /**
+         * Finds the closest on-screen drivable segment to the given point, ignoring PLR and PR segments if the options are set
+         * @function WazeWrap.Geometry.findSDKClosestSegment
+         * @param {GeoJSON.Point} The given point to find the closest segment to
+         * @param {boolean} If true, Parking Lot Road segments will be ignored when finding the closest segment
+         * @param {boolean} If true, Private Road segments will be ignored when finding the closest segment
+         * @returns {Object} Returns an Object containing the Segment and Closest Point on the Segment
+        **/
+        this.findSDKClosestSegment = function (myPoint, ignorePLR, ignoreUnnamedPR) {
+            let minDistance = Number.POSITIVE_INFINITY;
+            let closestSegment;
+
+            for (const s of sdk.DataModel.Segments.getAll()) {
+                const segmentType = s.roadType;
+                if (segmentType === 10 || segmentType === 16 || segmentType === 18 || segmentType === 19 || (ignorePLR && segmentType === 20))
+                    continue;
+
+                if (ignoreUnnamedPR && segmentType === 17) {
+                    const primaryStreetId = s.primaryStreetId;
+                    const nm = sdk.DataModel.Streets.getById({streetId: primaryStreetId}).name;
+                    if (nm === null || nm.trim().length === 0) //PR
+                        continue;
+                }
+
+                const distanceToSegment = turf.pointToLineDistance(myPoint, s.geometry);
+
+                if (distanceToSegment < minDistance) {
+                    minDistance = distanceToSegment;
+                    closestSegment = {segment: s, closestPoint: turf.nearestPointOnLine(s.geometry, myPoint)};
                 }
             }
             return closestSegment;
@@ -1573,6 +1606,12 @@
          * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
          * @return {GeoJSON.Geometry } Orthogonalized geometry
         **/
+         * Returns orthogonalized geometry for the given geometry and threshold
+         * @function WazeWrap.Util.GeoJSONOrthogonalizeGeometry
+         * @param {GeoJSON.Geometry} The SDK/GeoJSON.Geometry to orthogonalize
+         * @param {integer} threshold to use for orthogonalization - the higher the threshold, the more nodes that will be removed
+         * @return {GeoJSON.Geometry } Orthogonalized geometry
+        **/
         this.GeoJSONOrthogonalizeGeometry = function (geometry, threshold = 12) {
             const nomthreshold = threshold, // degrees within right or straight to alter
                 lowerThreshold = Math.cos((90 - nomthreshold) * Math.PI / 180),
@@ -1590,7 +1629,7 @@
                     i, j, score, motions;
 
                 // Triangle
-                if (nodes.length === 4) {
+                if (points.length === 4) {
                     for (i = 0; i < 1000; i++) {
                         motions = points.map(calcMotion);
 
@@ -1650,6 +1689,12 @@
                         const n = points[i];
                         n[1] = latp2lat(n[1]);
                         const pp = n;
+                for (i = 0; i < points.length; i++) {
+                    // only move the points that actually moved
+                    if (originalPoints[i][0] !== points[i][0] || originalPoints[i][1] !== points[i][1]) {
+                        const n = points[i];
+                        n[1] = latp2lat(n[1]);
+                        const pp = n;
 
                         const id = nodes[i].toString();
                         for (j = 0; j < nodes.length; j++) {
@@ -1671,6 +1716,10 @@
                             if (nodes[j].toString() !== id)
                                 continue;
 
+                            nodes[j] = false;
+                        }
+                    }
+                }
                             nodes[j] = false;
                         }
                     }
