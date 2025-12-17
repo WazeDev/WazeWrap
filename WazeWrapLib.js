@@ -246,12 +246,12 @@
                 $('<link/>', {
                     rel: 'stylesheet',
                     type: 'text/css',
-                    href: 'https://cdn.statically.io/gh/WazeDev/toastr/master/build/toastr.min.css'
+                    href: 'https://cdn.jsdelivr.net/gh/WazeDev/toastr@master/build/toastr.min.css'
                 }),
                 $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
             );
 
-            await $.getScript('https://cdn.statically.io/gh/WazeDev/toastr/master/build/toastr.min.js');
+            await $.getScript('https://cdn.jsdelivr.net/gh/WazeDev/toastr@master/build/toastr.min.js');
 		wazedevtoastr.options = {
 		    target: '#map',
 		    timeOut: 6000,
