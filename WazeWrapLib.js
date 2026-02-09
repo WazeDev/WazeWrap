@@ -29,7 +29,7 @@
         console.log("WazeWrap initializing...");
         WazeWrap.Version = "2025.04.11.00";
         WazeWrap.isBetaEditor = /beta/.test(location.href);
-        WazeWrap.Repo = 'JS55CT';  
+        WazeWrap.Repo = 'wazedev';  
 		
 	loadSettings();
 	    if(W.map.events)
