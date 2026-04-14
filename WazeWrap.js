@@ -1,50 +1,67 @@
 // ==UserScript==
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      2025.03.22.00
-// @description  A base library for WME script writers
-// @author       JustinS83/MapOMatic
+// @version      3.0.0
+// @description  Lightweight alerts and update monitoring for WME scripts
+// @author       JustinS83/MapOMatic/JS55CT
 // @include      https://beta.waze.com/*editor*
 // @include      https://www.waze.com/*editor*
 // @exclude      https://www.waze.com/*user/editor/*
 // @grant        GM_xmlhttpRequest
+// @run-at       document-start
 // ==/UserScript==
 
 /* global WazeWrap */
 /* global $ */
-/* jshint esversion:6 */
 
-var WazeWrap = {};
+var WazeWrap;
 
 (function() {
-    'use strict';
-    const MIN_VERSION = '2019.05.01.01';
-    // const WW_URL = 'https://cdn.jsdelivr.net/gh/WazeDev/WazeWrap@latest/WazeWrapLib.js'; //'https://cdn.staticaly.com/gh/WazeDev/WazeWrap/master/WazeWrapLib.js?env=dev';
-    const WW_URL = 'https://wazedev.github.io/WazeWrap/WazeWrapLib.js';
+  'use strict';
 
-    async function init(){
-        const sandboxed = typeof unsafeWindow !== 'undefined';
-        const pageWindow = sandboxed ? unsafeWindow : window;
-        const wwAvailable = pageWindow.WazeWrap && (!pageWindow.WazeWrap.Version || pageWindow.WazeWrap.Version > MIN_VERSION);
+  /**
+   * Configuration - Change REPO to point to your fork for testing
+   * Examples:
+   *   'wazedev'     - Official (https://wazedev.github.io/WazeWrap/WazeWrapLib.js)
+   *   'yourname'    - Your fork (https://yourname.github.io/WazeWrap/WazeWrapLib.js)
+   */
+  const REPO = 'JS55CT'//'wazedev';
+  const WW_LIB_URL = 'https://' + REPO + '.github.io/WazeWrap/WazeWrapLib.js';
 
-        if (wwAvailable) {
-            WazeWrap = pageWindow.WazeWrap;
-        } else {
-            pageWindow.WazeWrap = WazeWrap;
-        }
-        if (sandboxed) window.WazeWrap = WazeWrap;
-        if (!wwAvailable) await $.getScript(WW_URL);
+  /**
+   * Load WazeWrap library
+   * Features: Alerts, Script Update Monitoring, Update Dashboard
+   * No Waze W object or OpenLayers dependencies required
+   */
+
+  function init() {
+    // Handle sandboxed Tampermonkey environment
+    const sandboxed = typeof unsafeWindow !== 'undefined';
+    const pageWindow = sandboxed ? unsafeWindow : window;
+
+    // Create WazeWrap object and expose to both contexts
+    if (!pageWindow.WazeWrap) pageWindow.WazeWrap = {};
+    WazeWrap = pageWindow.WazeWrap;  // Assign to global
+    if (sandboxed) window.WazeWrap = pageWindow.WazeWrap;
+
+    // Set repo and load library
+    pageWindow.WazeWrap.Repo = REPO;
+    console.log('WazeWrap: Loading library');
+    $.getScript(WW_LIB_URL).fail(function(error) {
+      console.error('Failed to load WazeWrap library:', error);
+    });
+  }
+
+  /**
+   * Bootstrap - wait for jQuery, then initialize
+   */
+  function bootstrap(tries = 1) {
+    if (typeof $ !== 'undefined') {
+      init();
+    } else if (tries < 1000) {
+      setTimeout(function () { bootstrap(tries++); }, 100);
     }
-    
-    function bootstrap(tries = 1) {
-        if (typeof $ != 'undefined')
-            init();
-        else if (tries < 1000)
-            setTimeout(function () { bootstrap(tries++); }, 100);
-        else
-            console.log('WazeWrap launcher failed to load');
-    }
-    
-    bootstrap();
-    
+  }
+
+  bootstrap();
 })();
