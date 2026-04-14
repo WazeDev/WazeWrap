@@ -25,9 +25,9 @@ var WazeWrap;
    *   'wazedev'     - Official (https://wazedev.github.io/WazeWrap/WazeWrapLib.js)
    *   'yourname'    - Your fork (https://yourname.github.io/WazeWrap/WazeWrapLib.js)
    */
-  const REPO = 'JS55CT'//'wazedev';
+  const REPO = 'wazedev';
   const WW_LIB_URL = 'https://' + REPO + '.github.io/WazeWrap/WazeWrapLib.js';
-
+ 
   /**
    * Load WazeWrap library
    * Features: Alerts, Script Update Monitoring, Update Dashboard
