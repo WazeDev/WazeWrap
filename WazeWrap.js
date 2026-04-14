@@ -39,12 +39,22 @@ var WazeWrap;
     const sandboxed = typeof unsafeWindow !== 'undefined';
     const pageWindow = sandboxed ? unsafeWindow : window;
 
+    // Check if WazeWrap is already loading or initialized
+    // (Repo is set synchronously before $.getScript, so it acts as a loading flag)
+    if (pageWindow.WazeWrap && pageWindow.WazeWrap.Repo) {
+      console.log('WazeWrap already loading or initialized, skipping library load');
+      WazeWrap = pageWindow.WazeWrap;
+      if (sandboxed) window.WazeWrap = pageWindow.WazeWrap;
+      return;
+    }
+
     // Create WazeWrap object and expose to both contexts
     if (!pageWindow.WazeWrap) pageWindow.WazeWrap = {};
     WazeWrap = pageWindow.WazeWrap;  // Assign to global
     if (sandboxed) window.WazeWrap = pageWindow.WazeWrap;
 
-    // Set repo and load library
+    // Set repo IMMEDIATELY (synchronously before async $.getScript)
+    // This signals other loaders that WazeWrap is loading
     pageWindow.WazeWrap.Repo = REPO;
     console.log('WazeWrap: Loading library');
     $.getScript(WW_LIB_URL).fail(function(error) {
