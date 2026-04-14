@@ -10,7 +10,7 @@
 🔔 **Script Update Monitoring** — Automatically check for and notify users of script updates  
 📊 **Update Dashboard** — Beautiful modal showing available script updates  
 ⚙️ **Settings Tab** — Customize alert visibility and preferences in WME sidebar  
-💾 **Persistent History** — Remember alert history and settings across sessions  
+💾 **Persistent History** — Remember alert history and settings across sessions
 
 ---
 
@@ -55,17 +55,16 @@ WazeWrap.Alerts.success('MyScript', 'Success message');
 WazeWrap.Alerts.confirm(
   'MyScript',
   'Are you sure?',
-  () => { console.log('OK clicked'); },
-  () => { console.log('Cancel clicked'); }
+  () => {
+    console.log('OK clicked');
+  },
+  () => {
+    console.log('Cancel clicked');
+  },
 );
 
 // Monitor for script updates
-const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor(
-  'MyScript',
-  '1.0.0',
-  'https://greasyfork.org/scripts/12345/my-script.user.js',
-  GM_xmlhttpRequest
-);
+const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor('MyScript', '1.0.0', 'https://greasyfork.org/scripts/12345/my-script.user.js', GM_xmlhttpRequest);
 updateMonitor.start(2); // Check every 2 hours
 ```
 
@@ -76,6 +75,7 @@ updateMonitor.start(2); // Check every 2 hours
 ### Alerts
 
 #### `WazeWrap.Alerts.info(title, message, [disableTimeout, disableClickToClose, timeOut])`
+
 Display an info notification.
 
 ```javascript
@@ -84,6 +84,7 @@ WazeWrap.Alerts.info('MyScript', 'Click to dismiss', false, true); // No auto-di
 ```
 
 #### `WazeWrap.Alerts.warning(title, message)`
+
 Display a warning notification.
 
 ```javascript
@@ -91,6 +92,7 @@ WazeWrap.Alerts.warning('MyScript', 'Invalid input');
 ```
 
 #### `WazeWrap.Alerts.error(title, message)`
+
 Display an error notification.
 
 ```javascript
@@ -98,6 +100,7 @@ WazeWrap.Alerts.error('MyScript', 'Failed to load data');
 ```
 
 #### `WazeWrap.Alerts.success(title, message)`
+
 Display a success notification.
 
 ```javascript
@@ -105,6 +108,7 @@ WazeWrap.Alerts.success('MyScript', 'Changes saved!');
 ```
 
 #### `WazeWrap.Alerts.debug(title, message)`
+
 Display a debug notification (minimal styling).
 
 ```javascript
@@ -112,6 +116,7 @@ WazeWrap.Alerts.debug('MyScript', 'Debug info: ' + JSON.stringify(data));
 ```
 
 #### `WazeWrap.Alerts.confirm(title, message, okFn, cancelFn, [okText, cancelText])`
+
 Display a confirmation dialog.
 
 ```javascript
@@ -121,11 +126,12 @@ WazeWrap.Alerts.confirm(
   () => deleteItem(),
   () => console.log('Cancelled'),
   'Delete',
-  'Cancel'
+  'Cancel',
 );
 ```
 
 #### `WazeWrap.Alerts.prompt(title, message, [defaultText, okFn, cancelFn])`
+
 Display a text input dialog.
 
 ```javascript
@@ -134,7 +140,7 @@ WazeWrap.Alerts.prompt(
   'Enter your name:',
   'Default Name',
   (text) => console.log('User entered: ' + text),
-  () => console.log('Cancelled')
+  () => console.log('Cancelled'),
 );
 ```
 
@@ -145,6 +151,7 @@ WazeWrap.Alerts.prompt(
 Create a monitor to check for script updates.
 
 **Parameters:**
+
 - `scriptName` (string) — Display name of your script
 - `version` (string/number) — Current installed version
 - `downloadUrl` (string) — URL to `.user.js` file (for Greasy Fork)
@@ -155,12 +162,7 @@ Create a monitor to check for script updates.
 **Methods:**
 
 ```javascript
-const monitor = new WazeWrap.Alerts.ScriptUpdateMonitor(
-  'MyScript',
-  '1.0.0',
-  'https://greasyfork.org/scripts/12345/my-script.user.js',
-  GM_xmlhttpRequest
-);
+const monitor = new WazeWrap.Alerts.ScriptUpdateMonitor('MyScript', '1.0.0', 'https://greasyfork.org/scripts/12345/my-script.user.js', GM_xmlhttpRequest);
 
 // Start checking every 2 hours (default), immediately check first (default)
 monitor.start(2, true);
@@ -181,7 +183,7 @@ WazeWrap.Interface.ShowScriptUpdate(
   '2.0.0',
   '<h4>New Features</h4><ul><li>Feature 1</li><li>Feature 2</li></ul>',
   'https://greasyfork.org/scripts/12345/my-script',
-  'https://forum.waze.com/...'
+  'https://forum.waze.com/...',
 );
 ```
 
@@ -197,34 +199,6 @@ if (WazeWrap.Ready) {
   WazeWrap.Alerts.info('MyScript', 'Ready!');
 }
 ```
-
----
-
-## Configuration
-
-### Changing toastr Repository (for testing)
-
-In your script, before loading WazeWrap:
-
-```javascript
-// This is advanced — normally not needed
-window.WazeWrap = { Repo: 'yourname' }; // Your GitHub username
-// @require https://wazedev.github.io/WazeWrap/WazeWrap.js
-```
-
-This loads toastr from `https://yourname.github.io/WazeWrap/toastr.js` instead of the official location.
-
----
-
-## Migration from v2.x
-
-If you were using WazeWrap v2.x (Full version) with features like `WazeWrap.Model.*` or `WazeWrap.Geometry.*`, those have been removed in v3.0.
-
-**See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for detailed upgrade instructions.**
-
-In summary:
-- **Alerts & Update Monitoring:** Works as before, upgrade to v3.0
-- **Map Model/Geometry/Events:** Use WME SDK directly: `getWmeSdk({ scriptName, scriptId })`
 
 ---
 
@@ -253,12 +227,7 @@ if (typeof WazeWrap !== 'undefined' && WazeWrap.Ready) {
 // @grant GM_xmlhttpRequest
 
 function init() {
-  const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor(
-    'MyScript',
-    GM_info.script.version,
-    'https://greasyfork.org/scripts/12345/my-script.user.js',
-    GM_xmlhttpRequest
-  );
+  const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor('MyScript', GM_info.script.version, 'https://greasyfork.org/scripts/12345/my-script.user.js', GM_xmlhttpRequest);
   updateMonitor.start(2); // Check every 2 hours
 }
 
@@ -290,7 +259,7 @@ function init() {
       WazeWrap.Alerts.info('MyScript', 'Cancelled');
     },
     'Apply',
-    'Cancel'
+    'Cancel',
   );
 }
 
@@ -304,51 +273,3 @@ function waitForWazeWrap(tries = 0) {
 
 waitForWazeWrap();
 ```
-
----
-
-## Troubleshooting
-
-### Alerts not appearing
-
-1. Ensure `WazeWrap.Ready === true` before calling alert methods
-2. Check browser console for errors
-3. Verify toastr.js is loading (network tab)
-4. Check WME editor is fully loaded before initializing
-
-### Update monitor not detecting updates
-
-1. Verify `downloadUrl` ends with `.user.js` and is accessible
-2. For Greasy Fork scripts, the `.meta.js` file must exist at the same location
-3. Check browser console for HTTP errors
-4. Ensure `GM_xmlhttpRequest` is granted in script header with `@grant`
-
-### Settings not persisting
-
-1. Check browser's localStorage is enabled
-2. Look for `"_wazewrap_settings"` key in DevTools → Application → Storage → Local Storage
-3. Clear localStorage if corrupted: `localStorage.clear()`
-
----
-
-## Contributing
-
-Found a bug? Have a feature request?
-
-1. Check existing [issues](https://github.com/WazeDev/WazeWrap/issues)
-2. Create a new issue with details and steps to reproduce
-3. Pull requests welcome!
-
----
-
-## License
-
-WazeWrap is maintained by the WazeDev community. See LICENSE file for details.
-
----
-
-## Version
-
-**v3.0.0** — Single standard version with alerts and update monitoring only
-
-See [CLAUDE.md](CLAUDE.md) for development notes and [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for upgrading from v2.x.
