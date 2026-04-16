@@ -2,7 +2,13 @@
 
 **Lightweight alerts and script update monitoring for Waze Map Editor (WME) scripts**
 
+> **Upgrading from v2.x?** See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for what changed and how to update your scripts.
+
 ---
+
+## Why v3.0?
+
+WME is transitioning away from the legacy W object and OpenLayers (OL) APIs. **WazeWrap v3.0 is built on the modern WME SDK**, ensuring your scripts remain compatible as WME evolves. Use v3.0 for alerts and update monitoring—use WME SDK directly for map features.
 
 ## Features
 
@@ -21,23 +27,29 @@
 In your Tampermonkey script header:
 
 ```javascript
-// @require https://wazedev.github.io/WazeWrap/WazeWrap.js
+// @require https://greasyfork.org/scripts/24851-wazewrap/code/WazeWrap.js
 ```
 
 ### 2. Wait for Initialization
 
+Check `WazeWrap.Ready` to know when it's initialized:
+
 ```javascript
-// Wait for WazeWrap to be ready
-function waitForWazeWrap(callback, tries = 0) {
-  if (typeof WazeWrap !== 'undefined' && WazeWrap.Ready) {
+// Check if ready immediately
+if (WazeWrap && WazeWrap.Ready) {
+  WazeWrap.Alerts.success('MyScript', 'Script initialized!');
+}
+
+// Or wait for it with a simple loop
+function waitForReady(callback, tries = 0) {
+  if (WazeWrap && WazeWrap.Ready) {
     callback();
-  } else if (tries < 100) {
-    setTimeout(() => waitForWazeWrap(callback, tries + 1), 100);
+  } else if (tries < 1000) {
+    setTimeout(() => waitForReady(callback, tries + 1), 100);
   }
 }
 
-waitForWazeWrap(() => {
-  // Your script code here
+waitForReady(() => {
   WazeWrap.Alerts.success('MyScript', 'Script initialized!');
 });
 ```
@@ -207,69 +219,61 @@ if (WazeWrap.Ready) {
 ### Example 1: Simple Alert
 
 ```javascript
-// @require https://wazedev.github.io/WazeWrap/WazeWrap.js
+// @require https://greasyfork.org/scripts/24851-wazewrap/code/WazeWrap.js
 
 function init() {
-  WazeWrap.Alerts.success('MyScript', 'Hello, WME!');
+  if (WazeWrap && WazeWrap.Ready) {
+    WazeWrap.Alerts.success('MyScript', 'Hello, WME!');
+  } else {
+    setTimeout(init, 100);
+  }
 }
 
-if (typeof WazeWrap !== 'undefined' && WazeWrap.Ready) {
-  init();
-} else {
-  setTimeout(init, 1000);
-}
+init();
 ```
 
 ### Example 2: Update Monitor
 
 ```javascript
-// @require https://wazedev.github.io/WazeWrap/WazeWrap.js
+// @require https://greasyfork.org/scripts/24851-wazewrap/code/WazeWrap.js
 // @grant GM_xmlhttpRequest
 
 function init() {
-  const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor('MyScript', GM_info.script.version, 'https://greasyfork.org/scripts/12345/my-script.user.js', GM_xmlhttpRequest);
-  updateMonitor.start(2); // Check every 2 hours
-}
-
-function waitForWazeWrap(tries = 0) {
-  if (typeof WazeWrap !== 'undefined' && WazeWrap.Ready) {
-    init();
-  } else if (tries < 100) {
-    setTimeout(() => waitForWazeWrap(tries + 1), 100);
+  if (WazeWrap && WazeWrap.Ready) {
+    const updateMonitor = new WazeWrap.Alerts.ScriptUpdateMonitor('MyScript', GM_info.script.version, 'https://greasyfork.org/scripts/12345/my-script.user.js', GM_xmlhttpRequest);
+    updateMonitor.start(2); // Check every 2 hours
+  } else {
+    setTimeout(init, 100);
   }
 }
 
-waitForWazeWrap();
+init();
 ```
 
 ### Example 3: User Confirmation
 
 ```javascript
-// @require https://wazedev.github.io/WazeWrap/WazeWrap.js
+// @require https://greasyfork.org/scripts/24851-wazewrap/code/WazeWrap.js
 
 function init() {
-  WazeWrap.Alerts.confirm(
-    'MyScript',
-    'Apply changes to 50 segments?',
-    () => {
-      applyChanges();
-      WazeWrap.Alerts.success('MyScript', 'Changes applied!');
-    },
-    () => {
-      WazeWrap.Alerts.info('MyScript', 'Cancelled');
-    },
-    'Apply',
-    'Cancel',
-  );
-}
-
-function waitForWazeWrap(tries = 0) {
-  if (typeof WazeWrap !== 'undefined' && WazeWrap.Ready) {
-    init();
-  } else if (tries < 100) {
-    setTimeout(() => waitForWazeWrap(tries + 1), 100);
+  if (WazeWrap && WazeWrap.Ready) {
+    WazeWrap.Alerts.confirm(
+      'MyScript',
+      'Apply changes to 50 segments?',
+      () => {
+        applyChanges();
+        WazeWrap.Alerts.success('MyScript', 'Changes applied!');
+      },
+      () => {
+        WazeWrap.Alerts.info('MyScript', 'Cancelled');
+      },
+      'Apply',
+      'Cancel',
+    );
+  } else {
+    setTimeout(init, 100);
   }
 }
 
-waitForWazeWrap();
+init();
 ```
