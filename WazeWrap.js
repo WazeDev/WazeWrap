@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      3.0.0
+// @version      2026.04.18.00
 // @description  Lightweight alerts and update monitoring for WME scripts
 // @author       JustinS83/MapOMatic/JS55CT
 // @include      https://beta.waze.com/*editor*
