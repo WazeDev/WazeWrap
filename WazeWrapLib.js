@@ -17,9 +17,6 @@
   // Settings object - initialized in loadSettings
   let wwSettings;
 
-  // SDK object - obtained during init()
-  let sdk = null;
-
   // WazeWrap is set up by loader before library loads
   const WazeWrap = window.WazeWrap;
 
@@ -41,18 +38,6 @@
   async function init() {
     console.log('Initializing WazeWrap...');
 
-    // Get SDK
-    if (!sdk) {
-      try {
-        const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-        await pageWindow.SDK_INITIALIZED;
-        sdk = pageWindow.getWmeSdk({ scriptName: 'WazeWrap', scriptId: 'WW' });
-        console.log('WazeWrap obtained SDK');
-      } catch (e) {
-        console.warn('Could not obtain SDK:', e);
-      }
-    }
-
     loadSettings();
 
     // Initialize script update interface (dashboard, alerts history)
@@ -69,13 +54,6 @@
       console.warn('Error loading toastr:', e);
     }
 
-    // Create settings tab
-    try {
-      await initializeWWInterface();
-    } catch (e) {
-      console.warn('Could not initialize UI tab:', e);
-    }
-
     // Instantiate modules
     WazeWrap.Alerts = new Alerts();
     WazeWrap.Interface = new Interface();
@@ -86,122 +64,16 @@
     console.log('WazeWrap initialized successfully');
   }
 
-  // ===== Settings Tab Management =====
-
-  async function initializeWWInterface() {
-    // Create/register tab via SDK
-    if (!sdk?.Sidebar?.registerScriptTab) {
-      console.warn('SDK Sidebar API not available, cannot create settings tab');
-      return;
-    }
-
-    try {
-      const { tabLabel, tabPane } = await sdk.Sidebar.registerScriptTab();
-
-      // Populate tab with settings UI
-      const $label = $('<span>').text('WazeWrap');
-      $(tabLabel).append($label);
-
-      const $section = $("<div>", { style: "padding:8px 16px", id: "wazewrap-settings" });
-      $section.html([
-        '<h4 style="margin-bottom:0px;"><b>WazeWrap</b></h4>',
-        '<h6 style="margin-top:0px;">v3.0</h6>',
-        `<div id="divShowAlertHistory" class="controls-container"><input type="checkbox" id="_cbShowAlertHistory" class="wwSettingsCheckbox" ${wwSettings.showAlertHistoryIcon ? 'checked' : ''} /><label for="_cbShowAlertHistory">Show alerts history</label></div>`
-      ].join(' '));
-
-      $(tabPane).append($section);
-
-      console.log('WazeWrap tab created successfully');
-
-      // Bind event handlers
-      postInterfaceSetup();
-
-    } catch (error) {
-      console.warn('Failed to register WazeWrap tab:', error);
-    }
-  }
-
-  // ===== Post-Interface Setup =====
-
-  function postInterfaceSetup() {
-    try {
-      setChecked('_cbShowAlertHistory', wwSettings.showAlertHistoryIcon);
-
-      if (!wwSettings.showAlertHistoryIcon)
-        $('.WWAlertsHistory').css('display', 'none');
-
-      $('#_cbShowAlertHistory').change(function() {
-        if (this.checked)
-          $('.WWAlertsHistory').css('display', 'block');
-        else
-          $('.WWAlertsHistory').css('display', 'none');
-        wwSettings.showAlertHistoryIcon = this.checked;
-        saveSettings();
-      });
-    } catch (e) {
-      console.warn('Could not set up event handlers:', e);
-    }
-  }
-
   // ===== Helper Function =====
 
   function setChecked(checkboxId, checked) {
     $('#' + checkboxId).prop('checked', checked);
   }
 
-  // ===== Settings Management =====
-
-  function loadSettings() {
-    wwSettings = $.parseJSON(localStorage.getItem("_wazewrap_settings"));
-    let _defaultsettings = {
-        showAlertHistoryIcon: true
-    };
-    wwSettings = $.extend({}, _defaultsettings, wwSettings);
-}
-
-  function saveSettings() {
-    if (localStorage) {
-        let settings = {
-            showAlertHistoryIcon: wwSettings.showAlertHistoryIcon
-        };
-        localStorage.setItem("_wazewrap_settings", JSON.stringify(settings));
-    }
-  }
-
   // ===== Toastr Management =====
 
   async function initializeToastr() {
-    let toastrSettings = {};
     try {
-      function loadSettings() {
-                var loadedSettings = $.parseJSON(localStorage.getItem("WWToastr"));
-                var defaultSettings = {
-                    historyLeftLoc: 35,
-                    historyTopLoc: 40
-                };
-                toastrSettings = $.extend({}, defaultSettings, loadedSettings)
-            }
-
-            function saveSettings() {
-                if (localStorage) {
-                    var localsettings = {
-                        historyLeftLoc: toastrSettings.historyLeftLoc,
-                        historyTopLoc: toastrSettings.historyTopLoc
-                    };
-
-                    localStorage.setItem("WWToastr", JSON.stringify(localsettings));
-                }
-            }
-            loadSettings();
-      $('head').append(
-        $('<link/>', {
-          rel: 'stylesheet',
-          type: 'text/css',
-          href: 'https://'+WazeWrap.Repo+'.github.io/WazeWrap/toastr.css'
-        }),
-        $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;} .WWAlertsHistory {display:' + (wwSettings.showAlertHistoryIcon ? 'block' : 'none') + '; width:32px; height:32px; background-color: #F89406; position: absolute; top:35px; left:40px; border-radius: 10px; border: 2px solid; box-size: border-box; z-index: 1050;} .WWAlertsHistory:hover #WWAlertsHistory-list{display:block;} .WWAlertsHistory > .fa-exclamation-triangle {position: absolute; left:50%; margin-left:-9px; margin-top:8px;} #WWAlertsHistory-list{display:none; position:absolute; top:28px; border:2px solid black; border-radius:10px; background-color:white; padding:4px; overflow-y:auto; max-height: 300px;} #WWAlertsHistory-list #toast-container-history > div {max-width:500px; min-width:500px; border-radius:10px;} #WWAlertsHistory-list > #toast-container-history{ position:static; }</style>')
-      );
-
       await $.getScript('https://'+WazeWrap.Repo+'.github.io/WazeWrap/toastr.js');
       wazedevtoastr.options = {
         target: '#map',
@@ -214,39 +86,11 @@
         progressBar: true
       };
 
-      var $sectionToastr = $("<div>", { style: "padding:8px 16px", id: "wmeWWScriptUpdates" });
-      $sectionToastr.html([
-        '<div class="WWAlertsHistory" title="Script Alert History"><i class="fa fa-exclamation-triangle fa-lg"></i><div id="WWAlertsHistory-list"><div id="toast-container-history" class="toast-container-wazedev"></div></div></div>'
-      ].join(' '));
-      $("#WazeMap").append($sectionToastr.html());
-
-      $('.WWAlertsHistory').css('left', `${toastrSettings.historyLeftLoc}px`);
-      $('.WWAlertsHistory').css('top', `${toastrSettings.historyTopLoc}px`);
-
       try {
         await $.getScript("https://greasyfork.org/scripts/454988-jqueryui-custom-build/code/jQueryUI%20custom%20build.js");
       }
       catch (err) {
         console.log("Could not load jQuery UI " + err);
-      }
-
-      if ($.ui) {
-        $('.WWAlertsHistory').draggable({
-          stop: function () {
-            let windowWidth = $('#map').width();
-            let panelWidth = $('#WWAlertsHistory-list').width();
-            let historyLoc = $('.WWAlertsHistory').position().left;
-            if ((panelWidth + historyLoc) > windowWidth) {
-              $('#WWAlertsHistory-list').css('left', Math.abs(windowWidth - (historyLoc + $('.WWAlertsHistory').width()) - panelWidth) * -1);
-            }
-            else
-              $('#WWAlertsHistory-list').css('left', 'auto');
-
-            toastrSettings.historyLeftLoc = $('.WWAlertsHistory').position().left;
-            toastrSettings.historyTopLoc = $('.WWAlertsHistory').position().top;
-            saveSettings();
-          }
-        });
       }
     }
     catch (err) {
@@ -300,13 +144,7 @@
       '.WWSU-active { transform: translate3d(5px, 0px, 0px); box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 7px 0px; }',
       '#WWSU-script-update-info { width:auto; background-color:white; height:275px; overflow-y:auto; border-radius:8px; box-shadow: rgba(0, 0, 0, 0.09) 0px 6px 7px 0.09px; padding:15px; position:relative;}',
       '#WWSU-script-update-info div { display: none;}',
-      '#WWSU-script-update-info div:target { display: block; }',
-      `.WWAlertsHistory {display:${wwSettings.showAlertHistoryIcon ? 'block' : 'none'}; width:32px; height:32px; background-color: #F89406; position: absolute; top:35px; left:40px; border-radius: 10px; border: 2px solid; box-size: border-box; z-index: 1050;}`,
-      '.WWAlertsHistory:hover #WWAlertsHistory-list{display:block;}',
-      '.WWAlertsHistory > .fa-exclamation-triangle {position: absolute; left:50%; margin-left:-9px; margin-top:8px;}',
-      '#WWAlertsHistory-list{display:none; position:absolute; top:28px; border:2px solid black; border-radius:10px; background-color:white; padding:4px; overflow-y:auto; max-height: 300px;}',
-      '#WWAlertsHistory-list #toast-container-history > div {max-width:500px; min-width:500px; border-radius:10px;}',
-      '#WWAlertsHistory-list > #toast-container-history{ position:static; }'
+      '#WWSU-script-update-info div:target { display: block; }'
     ].join(' ');
     $('<style type="text/css">' + css + '</style>').appendTo('head');
   }
@@ -377,7 +215,7 @@
 
   function Alerts() {
     this.success = function (scriptName, message) {
-      $(wazedevtoastr.success(message, scriptName)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
+      wazedevtoastr.success(message, scriptName);
     }
 
     this.info = function (scriptName, message, disableTimeout, disableClickToClose, timeOut) {
@@ -390,15 +228,15 @@
       if (disableClickToClose)
         options.tapToDismiss = false;
 
-      $(wazedevtoastr.info(message, scriptName, options)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
+      wazedevtoastr.info(message, scriptName, options);
     }
 
     this.warning = function (scriptName, message) {
-      $(wazedevtoastr.warning(message, scriptName)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
+      wazedevtoastr.warning(message, scriptName);
     }
 
     this.error = function (scriptName, message) {
-      $(wazedevtoastr.error(message, scriptName)).clone().prependTo('#WWAlertsHistory-list > .toast-container-wazedev').find('.toast-close-button').remove();
+      wazedevtoastr.error(message, scriptName);
     }
 
     this.debug = function (scriptName, message) {
@@ -561,20 +399,6 @@
                       reject(res);
                   }
               });
-          });
-      }
-
-      #clearPreviousAlerts() {
-          $('.toast-container-wazedev .toast-info:visible').toArray().forEach(elem => {
-              const $alert = $(elem);
-              const title = $alert.find('.toast-title').text();
-              if (title === this.#scriptName) {
-                  const message = $alert.find('.toast-message').text();
-                  if (/version .* is available/i.test(message)) {
-                      // Force a click to make the alert go away.
-                      $alert.click();
-                  }
-              }
           });
       }
   }
