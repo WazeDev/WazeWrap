@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      2026.04.18.00
+// @version      2026.04.19.01
 // @description  Lightweight alerts and update monitoring for WME scripts
 // @author       JustinS83/MapOMatic/JS55CT
 // @include      https://beta.waze.com/*editor*
 // @include      https://www.waze.com/*editor*
 // @exclude      https://www.waze.com/*user/editor/*
 // @grant        GM_xmlhttpRequest
-// @run-at       document-start
 // ==/UserScript==
 
 /* global WazeWrap */
