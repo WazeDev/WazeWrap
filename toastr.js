@@ -282,4 +282,3 @@
         'undefined' != typeof module && module.exports ? (module.exports = t(require('jquery'))) : (window.wazedevtoastr = t(window.jQuery));
       },
 );
-//# sourceMappingURL=toastr.js.map
