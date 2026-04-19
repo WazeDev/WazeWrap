@@ -363,7 +363,6 @@
           }
           if (latestVersion > this.#currentVersion && latestVersion > (this.#lastVersionChecked || '0')) {
               this.#lastVersionChecked = latestVersion;
-              this.#clearPreviousAlerts();
               this.#postNewVersionAlert(latestVersion);
           }
       }
