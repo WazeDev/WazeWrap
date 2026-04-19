@@ -71,6 +71,15 @@
   // ===== Toastr Management =====
 
   async function initializeToastr() {
+	  $('head').append(
+                $('<link/>', {
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href: 'https://wazedev.github.io/WazeWrap/toastr.css'
+                }),
+                $('<style type="text/css">.toast-container-wazedev > div {opacity: 0.95;} .toast-top-center-wide {top: 32px;}</style>')
+            );
+	  
     try {
       await $.getScript('https://'+WazeWrap.Repo+'.github.io/WazeWrap/toastr.js');
       wazedevtoastr.options = {
