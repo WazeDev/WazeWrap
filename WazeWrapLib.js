@@ -38,8 +38,6 @@
   async function init() {
     console.log('Initializing WazeWrap...');
 
-    loadSettings();
-
     // Initialize script update interface (dashboard, alerts history)
     try {
       initializeScriptUpdateInterface();
