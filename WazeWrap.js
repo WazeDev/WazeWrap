@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WazeWrap
 // @namespace    https://greasyfork.org/users/30701-justins83-waze
-// @version      2026.04.26.01
+// @version      2026.05.03.01
 // @description  Self-contained WazeWrap with no external dependencies - includes toastr library and CSS
 // @author       JustinS83/MapOMatic/JS55CT
 // @include      https://beta.waze.com/*editor*
@@ -390,286 +390,567 @@ button.toast-close-button {
       return window.wazedevtoastr;
     };
 
-    // Call the UMD pattern with our simple loader
-    !(function (e) {
-      e(['jquery'], function (e) {
+
+(function (define) {
+    define(['jquery'], function ($) {
         return (function () {
-        function t(e, t, n) {
-          return C({ type: x.error, iconClass: h().iconClasses.error, message: e, optionsOverride: n, title: t });
-        }
-        function n(t, n) {
-          return (t || (t = h()), (w = e('#' + t.containerId)), w.length ? w : (n && (w = f(t)), w));
-        }
-        function o(e, t, n) {
-          return C({ type: x.info, iconClass: h().iconClasses.info, message: e, optionsOverride: n, title: t });
-        }
-        function i(e) {
-          O = e;
-        }
-        function s(e, t, n) {
-          return C({ type: x.prompt, iconClass: h().iconClasses.prompt, message: e, optionsOverride: n, title: t });
-        }
-        function a(e, t, n) {
-          return C({ type: x.success, iconClass: h().iconClasses.success, message: e, optionsOverride: n, title: t });
-        }
-        function r(e, t, n) {
-          return C({ type: x.warning, iconClass: h().iconClasses.warning, message: e, optionsOverride: n, title: t });
-        }
-        function c(e, t) {
-          var o = h();
-          (w || n(o), m(e, o, t) || p(o));
-        }
-        function l(e, t, n) {
-          return C({ type: x.confirm, iconClass: h().iconClasses.confirm, message: e, optionsOverride: n, title: t });
-        }
-        function u(e, t, n) {
-          return (
-            console.groupCollapsed('%c' + t, 'background: #252525; color: #e94f64'),
-            console.log(e),
-            console.groupEnd(),
-            C({ type: x.debug, iconClass: h().iconClasses.debug, message: e, optionsOverride: n, title: t })
-          );
-        }
-        function d(t) {
-          var o = h();
-          return (w || n(o), t && 0 === e(':focus', t).length ? void b(t) : void (w.children().length && w.remove()));
-        }
-        function p(t) {
-          for (var n = w.children(), o = n.length - 1; o >= 0; o--) m(e(n[o]), t);
-        }
-        function m(t, n, o) {
-          var i = !(!o || !o.force) && o.force;
-          return (
-            !(!t || (!i && 0 !== e(':focus', t).length)) &&
-            (t[n.hideMethod]({
-              duration: n.hideDuration,
-              easing: n.hideEasing,
-              complete: function () {
-                b(t);
-              },
-            }),
-            !0)
-          );
-        }
-        function f(t) {
-          return ((w = e('<div/>').attr('id', t.containerId).addClass(t.positionClass).addClass(t.containerClass)), w.appendTo(e(t.target)), w);
-        }
-        function g() {
-          return {
-            tapToDismiss: !0,
-            toastClass: 'toast-wazedev',
-            containerId: 'toast-container-wazedev',
-            containerClass: 'toast-container-wazedev',
-            debug: !1,
-            showMethod: 'fadeIn',
-            showDuration: 300,
-            showEasing: 'swing',
-            onShown: void 0,
-            hideMethod: 'fadeOut',
-            hideDuration: 1e3,
-            hideEasing: 'swing',
-            onHidden: void 0,
-            closeMethod: !1,
-            closeDuration: !1,
-            closeEasing: !1,
-            closeOnHover: !0,
-            extendedTimeOut: 1e3,
-            iconClasses: { confirm: 'toast-confirm', debug: 'toast-debug', error: 'toast-error', info: 'toast-info', prompt: 'toast-prompt', success: 'toast-success', warning: 'toast-warning' },
-            iconClass: 'toast-info',
-            positionClass: 'toast-top-right',
-            timeOut: 5e3,
-            titleClass: 'toast-title',
-            messageClass: 'toast-message',
-            escapeHtml: !1,
-            target: 'body',
-            closeHtml: '<button type="button">&times;</button>',
-            closeClass: 'toast-close-button',
-            newestOnTop: !0,
-            preventDuplicates: !1,
-            progressBar: !1,
-            progressClass: 'toast-progress',
-            rtl: !1,
-            PromptDefaultInput: '',
-            ConfirmOkButtonText: 'Ok',
-            ConfirmCancelButtonText: 'Cancel',
-          };
-        }
-        function v(e) {
-          O && O(e);
-        }
-        function C(t) {
-          function o(e) {
-            return (null == e && (e = ''), e.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-          }
-          function i() {
-            (('prompt' !== t.type && 'confirm' !== t.type) || ((B.tapToDismiss = !1), (B.timeOut = 0), (B.extendedTimeOut = 0), (B.closeButton = !1)),
-              'debug' === t.type && ((B.tapToDismiss = !1), (B.timeOut = 0), (B.extendedTimeOut = 0), (B.closeButton = !0)));
-          }
-          function s() {
-            (l(), d(), p(), m(), f(), g(), C(), O(), u(), a());
-          }
-          function a() {
-            var e = '';
-            switch (t.iconClass) {
-              case 'toast-success':
-              case 'toast-info':
-                e = 'polite';
-                break;
-              default:
-                e = 'assertive';
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                confirm: 'confirm',
+                debug: 'debug',
+                error: 'error',
+                info: 'info',
+                prompt: 'prompt',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                confirm: confirm,
+                debug: debug,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                prompt: prompt,
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.5',
+                warning: warning
+            };
+            var previousToast;
+            return toastr;
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
             }
-            q.attr('aria-live', e);
-          }
-          function r(e) {
-            (B.closeOnHover && q.hover(H, k),
-              !B.onclick && B.tapToDismiss && q.click(D),
-              B.closeButton &&
-                j &&
-                j.click(function (e) {
-                  (e.stopPropagation ? e.stopPropagation() : void 0 !== e.cancelBubble && e.cancelBubble !== !0 && (e.cancelBubble = !0), B.onCloseClick && B.onCloseClick(e), D(!0));
-                }),
-              B.onclick &&
-                'prompt' !== B.type &&
-                q.click(function (e) {
-                  (B.onclick(e), D());
-                }),
-              'prompt' === e.type &&
-                (S.click(function (e) {
-                  (B.promptOK && B.promptOK(e, A.val()), D(!0));
-                }),
-                Q.click(function (e) {
-                  (B.promptCancel && B.promptCancel(e), D(!0));
-                })),
-              'confirm' === e.type &&
-                (J.click(function (e) {
-                  (B.confirmOK && B.confirmOK(e), D(!0));
-                }),
-                L.click(function (e) {
-                  (B.confirmCancel && B.confirmCancel(e), D(!0));
-                })));
-          }
-          function c() {
-            (q.hide(),
-              q[B.showMethod]({ duration: B.showDuration, easing: B.showEasing, complete: B.onShown }),
-              B.timeOut > 0 &&
-                ((M = setTimeout(D, B.timeOut)), (N.maxHideTime = parseFloat(B.timeOut)), (N.hideEta = new Date().getTime() + N.maxHideTime), B.progressBar && (N.intervalId = setInterval(E, 10))));
-          }
-          function l() {
-            t.iconClass && q.addClass(B.toastClass).addClass(I);
-          }
-          function u() {
-            B.newestOnTop ? w.prepend(q) : w.append(q);
-          }
-          function d() {
-            if (t.title) {
-              var e = t.title;
-              (B.escapeHtml && (e = o(t.title)), z.append(e).addClass(B.titleClass), q.append(z));
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
             }
-          }
-          function p() {
-            if (t.message) {
-              var e = t.message.replace(/\n/g, '<br/>');
-              (B.escapeHtml && (e = o(t.message)), K.append(e).addClass(B.messageClass), q.append(K));
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
             }
-          }
-          function m() {
-            if ('prompt' === t.type) {
-              F.append(A);
-              var n = e('<div/>');
-              (n.append(S), n.append(Q), F.append(n), q.append(F), A.val(B.PromptDefaultInput));
+
+            function subscribe(callback) {
+                listener = callback;
             }
-          }
-          function f() {
-            if ('confirm' === t.type) {
-              var n = e('<div/>');
-              (n.append(J), n.append(L), G.append(n), q.append(G));
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
             }
-          }
-          function g() {
-            B.closeButton && (j.addClass(B.closeClass).attr('role', 'button'), q.prepend(j));
-          }
-          function C() {
-            B.progressBar && (P.addClass(B.progressClass), q.prepend(P));
-          }
-          function O() {
-            B.rtl && q.addClass('rtl');
-          }
-          function x(e, t) {
-            if (e.preventDuplicates) {
-              if (t.message === T) return !0;
-              T = t.message;
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
             }
-            return !1;
-          }
-          function D(t) {
-            var n = t && B.closeMethod !== !1 ? B.closeMethod : B.hideMethod,
-              o = t && B.closeDuration !== !1 ? B.closeDuration : B.hideDuration,
-              i = t && B.closeEasing !== !1 ? B.closeEasing : B.hideEasing;
-            if (!e(':focus', q).length || t)
-              return (
-                clearTimeout(N.intervalId),
-                q[n]({
-                  duration: o,
-                  easing: i,
-                  complete: function () {
-                    (b(q), clearTimeout(M), B.onHidden && 'hidden' !== R.state && B.onHidden(), (R.state = 'hidden'), (R.endTime = new Date()), v(R));
-                  },
-                })
-              );
-          }
-          function k() {
-            (B.timeOut > 0 || B.extendedTimeOut > 0) && ((M = setTimeout(D, B.extendedTimeOut)), (N.maxHideTime = parseFloat(B.extendedTimeOut)), (N.hideEta = new Date().getTime() + N.maxHideTime));
-          }
-          function H() {
-            (clearTimeout(M), (N.hideEta = 0), q.stop(!0, !0)[B.showMethod]({ duration: B.showDuration, easing: B.showEasing }));
-          }
-          function E() {
-            var e = ((N.hideEta - new Date().getTime()) / N.maxHideTime) * 100;
-            P.width(e + '%');
-          }
-          if (0 !== t.message.length) {
-            var B = h(),
-              I = t.iconClass || B.iconClass;
-            if (('undefined' != typeof t.optionsOverride && ((B = e.extend(B, t.optionsOverride)), (I = t.optionsOverride.iconClass || I)), i(), !x(B, t))) {
-              (y++, (w = n(B, !0)));
-              var M = null,
-                q = e('<div/>'),
-                z = e('<div/>'),
-                K = e('<div/>'),
-                P = e('<div/>'),
-                j = e(B.closeHtml),
-                F = e('<div/>'),
-                S = e('<button class="btn btn-primary toast-ok-btn">Ok</button>'),
-                Q = e('<button class="btn btn-danger">Cancel</button>'),
-                A = e('<input type="text" class="toast-prompt-input"/>'),
-                G = e('<div/>'),
-                J = e('<button class="btn btn-primary toast-ok-btn"></button>');
-              J.text(B.ConfirmOkButtonText);
-              var L = e('<button class="btn btn-danger"></button>');
-              L.text(B.ConfirmCancelButtonText);
-              var N = { intervalId: null, hideEta: null, maxHideTime: null },
-                R = { toastId: y, state: 'visible', startTime: new Date(), options: B, map: t };
-              return (s(), c(), r(t), v(R), B.debug && console && console.log(R), q);
+
+            function prompt(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.prompt,
+                    iconClass: getOptions().iconClasses.prompt,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
             }
-          }
-        }
-        function h() {
-          return e.extend({}, g(), D.options);
-        }
-        function b(e) {
-          (w || (w = n()), e.is(':visible') || (e.remove(), (e = null), 0 === w.children().length && (w.remove(), (T = void 0))));
-        }
-        var w,
-          O,
-          T,
-          y = 0,
-          x = { confirm: 'confirm', error: 'error', info: 'info', prompt: 'prompt', success: 'success', warning: 'warning', debug: 'debug' },
-          D = { clear: c, confirm: l, debug: u, remove: d, error: t, getContainer: n, info: o, options: {}, prompt: s, subscribe: i, success: a, version: '2.1.5', warning: r };
-        return D;
-      })();
+
+            function confirm(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.confirm,
+                    iconClass: getOptions().iconClasses.confirm,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function debug(message, title, optionsOverride) {
+                console.groupCollapsed('%c' + title, 'background: #252525; color: #e94f64');
+                console.log(message);
+                console.groupEnd();
+                return notify({
+                    type: toastType.debug,
+                    iconClass: getOptions().iconClasses.debug,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass)
+                    .addClass(options.containerClass);
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true, toastClass: 'toast-wazedev',
+                    containerId: 'toast-container-wazedev', containerClass: 'toast-container-wazedev',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut', hideDuration: 1000, hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false, closeDuration: false, closeEasing: false, closeOnHover: true,
+                    extendedTimeOut: 1000,
+                  
+                    iconClasses: {
+                        confirm: 'toast-confirm',
+                        debug: 'toast-debug',
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        prompt: 'toast-prompt',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    closeClass: 'toast-close-button',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false,
+                    progressClass: 'toast-progress',
+                    rtl: false,
+                    PromptDefaultInput: '',
+                    ConfirmOkButtonText: 'Ok',
+                    ConfirmCancelButtonText: 'Cancel'
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                if (map.message.length === 0) { return; }
+
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                // Force sticky behavior for prompt, confirm, and debug types
+                if (map.type === toastType.prompt || map.type === toastType.confirm) {
+                    options.tapToDismiss = false;
+                    options.timeOut = 0;
+                    options.extendedTimeOut = 0;
+                    options.closeButton = false;
+                }
+                if (map.type === toastType.debug) {
+                    options.tapToDismiss = false;
+                    options.timeOut = 0;
+                    options.extendedTimeOut = 0;
+                    options.closeButton = true;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var $promptContainer = $('<div/>');
+                var $promptOkButton = $('<button class="btn btn-primary toast-ok-btn">Ok</button>');
+                var $promptCancelButton = $('<button class="btn btn-danger">Cancel</button>');
+                var $promptInput = $('<input type="text" class="toast-prompt-input"/>');
+                var $confirmContainer = $('<div/>');
+                var $confirmOkButton = $('<button class="btn btn-primary toast-ok-btn"></button>');
+                var $confirmCancelButton = $('<button class="btn btn-danger"></button>');
+                $confirmOkButton.text(options.ConfirmOkButtonText);
+                $confirmCancelButton.text(options.ConfirmCancelButtonText);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+                displayToast();
+                handleEvents();
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null) {
+                        source = '';
+                    }
+
+                    return source
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setPrompt();
+                    setConfirm();
+                    setCloseButton();
+                    setProgressBar();
+                    setRTL();
+                    setSequence();
+                    setAria();
+                }
+
+                function setAria() {
+                    var ariaValue = '';
+                    switch (map.iconClass) {
+                        case 'toast-success':
+                        case 'toast-info':
+                            ariaValue =  'polite';
+                            break;
+                        default:
+                            ariaValue = 'assertive';
+                    }
+                    $toastElement.attr('aria-live', ariaValue);
+                }
+
+                function handleEvents() {
+                    if (options.closeOnHover) {
+                        $toastElement.hover(stickAround, delayedHideToast);
+                    }
+
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+
+                            if (options.onCloseClick) {
+                                options.onCloseClick(event);
+                            }
+
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick && options.type !== toastType.prompt) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+
+                    if (map.type === toastType.prompt) {
+                        $promptOkButton.click(function (event) {
+                            if (options.promptOK) { options.promptOK(event, $promptInput.val()); }
+                            hideToast(true);
+                        });
+                        $promptCancelButton.click(function (event) {
+                            if (options.promptCancel) { options.promptCancel(event); }
+                            hideToast(true);
+                        });
+                    }
+
+                    if (map.type === toastType.confirm) {
+                        $confirmOkButton.click(function (event) {
+                            if (options.confirmOK) { options.confirmOK(event); }
+                            hideToast(true);
+                        });
+                        $confirmCancelButton.click(function (event) {
+                            if (options.confirmCancel) { options.confirmCancel(event); }
+                            hideToast(true);
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        var suffix = map.title;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.title);
+                        }
+                        $titleElement.append(suffix).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        var suffix = map.message.replace(/\n/g, '<br/>');
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.message);
+                        }
+                        $messageElement.append(suffix).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setPrompt() {
+                    if (map.type === toastType.prompt) {
+                        $promptContainer.append($promptInput);
+                        var $buttonRow = $('<div/>');
+                        $buttonRow.append($promptOkButton);
+                        $buttonRow.append($promptCancelButton);
+                        $promptContainer.append($buttonRow);
+                        $toastElement.append($promptContainer);
+                        $promptInput.val(options.PromptDefaultInput);
+                    }
+                }
+
+                function setConfirm() {
+                    if (map.type === toastType.confirm) {
+                        var $buttonRow = $('<div/>');
+                        $buttonRow.append($confirmOkButton);
+                        $buttonRow.append($confirmCancelButton);
+                        $confirmContainer.append($buttonRow);
+                        $toastElement.append($confirmContainer);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass(options.closeClass).attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass(options.progressClass);
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function setRTL() {
+                    if (options.rtl) {
+                        $toastElement.addClass('rtl');
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            clearTimeout(intervalId);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
     });
-    })(simpleDefine);
-  } // End initializeToastrLibrary()
+}(simpleDefine));
+} // End initializeToastrLibrary()
 
   // ===== WAZEWRAP LIBRARY (Inline) =====
   // Main WazeWrap functionality with all utilities
