@@ -676,10 +676,6 @@ button.toast-close-button {
 
   let wwSettings;
 
-  function setChecked(checkboxId, checked) {
-    $('#' + checkboxId).prop('checked', checked);
-  }
-
   function initializeToastr() {
     // Initialize toastr library first (now that jQuery is available)
     initializeToastrLibrary();
