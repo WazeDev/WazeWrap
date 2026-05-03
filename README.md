@@ -1,18 +1,14 @@
-# WazeWrap (Self-Contained)
+# WazeWrap v3.0
 
 **Lightweight alerts and script update monitoring for Waze Map Editor (WME) scripts**
 
-**Version:** 2026.04.26 (Date-based versioning)  
-**Build:** Self-contained single file with all dependencies embedded  
+> **Upgrading from v2.x?** See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for what changed and how to update your scripts.
 
 ---
 
-## What's New in This Version
+## Why v3.0?
 
-✨ **Self-Contained Build** — No external dependencies, all CSS and libraries embedded inline  
-🚀 **Zero External Requests** — Removed jQuery UI loader, uses WME's Bootstrap for button styling  
-🔧 **Improved Initialization** — Deferred toastr loading prevents jQuery timing errors  
-📦 **Easy Deployment** — Single file ready for Greasyfork (no CDN dependencies)
+WME is transitioning away from the legacy W object and OpenLayers (OL) APIs. **WazeWrap v3.0 is built on the modern WME SDK**, ensuring your scripts remain compatible as WME evolves. Use v3.0 for alerts and update monitoring—use WME SDK directly for map features.
 
 ## Features
 
@@ -28,13 +24,11 @@
 
 ### 1. Add to Your Script
 
-In your Tampermonkey script header (add from Greasyfork when published):
+In your Tampermonkey script header:
 
 ```javascript
 // @require https://greasyfork.org/scripts/24851-wazewrap/code/WazeWrap.js
 ```
-
-**Note:** This self-contained version includes all dependencies (toastr, CSS) inline. No external requests are made.
 
 ### 2. Wait for Initialization
 
